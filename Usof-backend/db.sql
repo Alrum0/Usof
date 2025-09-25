@@ -1,0 +1,149 @@
+-- DROP TABLE IF EXISTS post_stars;
+-- DROP TABLE IF EXISTS post_image;
+-- DROP TABLE IF EXISTS post_categories;
+-- DROP TABLE IF EXISTS likes;
+-- DROP TABLE IF EXISTS comment_likes;
+-- DROP TABLE IF EXISTS comments;
+-- DROP TABLE IF EXISTS posts;
+-- DROP TABLE IF EXISTS categories;
+-- DROP TABLE IF EXISTS tokens;
+-- DROP TABLE IF EXISTS subscriptions;
+-- DROP TABLE IF EXISTS users;
+-- DROP TABLE IF EXISTS black_list;
+
+CREATE TABLE IF NOT EXISTS users 
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    fullName VARCHAR(255) NOT NULL,
+    login VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    isVeriffied BOOLEAN DEFAULT FALSE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('USER', 'ADMIN') DEFAULT 'USER',
+    avatar VARCHAR(512) DEFAULT NULL,
+    rating INT DEFAULT 0,
+    isOfficial BOOLEAN DEFAULT FALSE,
+    stars_balance INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS tokens
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT UNIQUE,
+    token VARCHAR(512) NOT NULL,
+    expiresAt TIMESTAMP NOT NULL,
+
+    CONSTRAINT fk_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS categories
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS posts
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    authorId INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    publishDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
+    content TEXT NOT NULL,
+
+    CONSTRAINT fk_post_author FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS comments
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    authorId INT NOT NULL,
+    postId INT NOT NULL,
+    publishDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    content TEXT NOT NULL,
+
+    CONSTRAINT fk_comment_post FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_author FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS likes
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT NOT NULL,
+    postId INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_like_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_like_post FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+    UNIQUE(userId, postId)
+);
+
+CREATE TABLE IF NOT EXISTS comment_likes
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT NOT NULL,
+    commentId INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_comment_like_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_like_comment FOREIGN KEY (commentId) REFERENCES comments(id) ON DELETE CASCADE,
+    UNIQUE(userId, commentId)
+);
+
+
+CREATE TABLE IF NOT EXISTS post_stars
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT NOT NULL,
+    postId INT NOT NULL,
+    stars INT NOT NULL CHECK (stars > 0),
+    
+    CONSTRAINT fk_stars_post FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_stars_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS subscriptions
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    followerId INT NOT NULL,
+    followingId INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_subscription_follower FOREIGN KEY (followerId) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_subscription_following FOREIGN KEY (followingId) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(followerId, followingId)
+);
+
+CREATE TABLE IF NOT EXISTS black_list
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    message TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- --------------------------------------
+
+
+
+
+CREATE TABLE IF NOT EXISTS post_categories
+(
+    postId INT NOT NULL,
+    categoryId INT NOT NULL,
+
+    PRIMARY KEY (postId, categoryId),
+
+    CONSTRAINT fk_post FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_category FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS post_image
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    postId INT NOT NULL,
+    fileName VARCHAR(512) NOT NULL,
+
+    CONSTRAINT fk_post_img FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE
+)
