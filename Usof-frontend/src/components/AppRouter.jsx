@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { authRoutes, publicRoutes } from '../routes';
 
 export default function AppRouter() {
-  const isAuth = false;
+  const isAuth = true;
   return (
     <Routes>
       {isAuth &&
