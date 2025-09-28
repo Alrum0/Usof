@@ -1,4 +1,4 @@
-import Logo from '../assets/Icon/logo.svg';
+import Logov2 from '../assets/Icon/Logo.png';
 
 import HomeIcon from '../assets/Icon/home-icon.svg?react';
 import SearchIcon from '../assets/Icon/search-icon.svg?react';
@@ -8,21 +8,37 @@ import ProfileIcon from '../assets/Icon/profile-icon.svg?react';
 import MoreVertical from '../assets/Icon/more-vertical-icon.svg?react';
 import AdminIcon from '../assets/Icon/star-admin-icon.svg?react';
 
+import AuthRequiredModel from '../components/AuthRequiredModel';
+
+import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
+
 import {
   ADMIN_ROUTE,
   MAIN_ROUTE,
   PROFILE_ROUTE,
   SEARCH_ROUTE,
 } from '../utils/consts';
-import { NavLink } from 'react-router-dom';
 
 export default function Header() {
+  const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
   const isAdmin = false;
+  const isAuth = false;
+
+  const handleProtectedAction = () => {
+    if (!isAuth) {
+      setIsAuthModelOpen(true);
+    }
+  };
 
   return (
-    <header className='w-20 h-screen flex flex-col justify-between items-center py-6 transition-all duration-300 overflow-hidden relative'>
+    <header className='fixed left-0 top-0 w-20 h-screen flex flex-col justify-between items-center py-6 transition-all duration-300 z-50'>
       <a href={MAIN_ROUTE}>
-        <img src={Logo} alt='Usof Logo' className='w-12 h-12' />
+        <img
+          src={Logov2}
+          alt='Usof Logo'
+          className='w-16 h-16 hover:scale-110 transition-all duration-300'
+        />
       </a>
       <nav className='-mt-12 '>
         <ul className='flex-col gap-4 flex '>
@@ -47,7 +63,7 @@ export default function Header() {
             <NavLink
               to={SEARCH_ROUTE}
               className={({ isActive }) =>
-                `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[#1d1d1d] ${
+                `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] ${
                   isActive ? 'text-white' : 'text-[#4d4d4d]'
                 }`
               }
@@ -56,15 +72,24 @@ export default function Header() {
             </NavLink>
           </li>
           <li>
-            <button className='group rounded-lg bg-[#1d1d1d] px-3.5 py-2 transition-all duration-200 cursor-pointer'>
+            <button
+              className='group rounded-lg bg-[var(--color-background-secondary)] px-3.5 py-2 transition-all duration-200 cursor-pointer'
+              onClick={handleProtectedAction}
+            >
               <PlusIcon className='w-7 h-7 text-[#4d4d4d] group-hover:text-white transition-all duration-200 ' />
             </button>
           </li>
           <li>
             <NavLink
+              onClick={(e) => {
+                if (!isAuth) {
+                  e.preventDefault();
+                  handleProtectedAction();
+                }
+              }}
               to='/admin'
               className={({ isActive }) =>
-                `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[#1d1d1d] ${
+                `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] ${
                   isActive ? ' text-white' : 'text-[#4d4d4d]'
                 }`
               }
@@ -80,8 +105,14 @@ export default function Header() {
           <li>
             <NavLink
               to={PROFILE_ROUTE + '/1'}
+              onClick={(e) => {
+                if (!isAuth) {
+                  e.preventDefault();
+                  handleProtectedAction();
+                }
+              }}
               className={({ isActive }) =>
-                `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[#1d1d1d] ${
+                `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] ${
                   isActive ? ' text-white' : 'text-[#4d4d4d]'
                 }`
               }
@@ -101,7 +132,7 @@ export default function Header() {
               <NavLink
                 to={ADMIN_ROUTE}
                 className={({ isActive }) =>
-                  `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[#1d1d1d] ${
+                  `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] ${
                     isActive ? ' text-white' : 'text-[#4d4d4d]'
                   }`
                 }
@@ -112,9 +143,14 @@ export default function Header() {
           )}
         </ul>
       </nav>
-      <button className='group rounded-lg hover:bg-[#1d1d1d] px-3.5 py-2 transition-all duration-200 cursor-pointer'>
+      <button className='group rounded-lg hover:bg-[var(--color-background-secondary)] px-3.5 py-2 transition-all duration-200 cursor-pointer'>
         <MoreVertical className='w-7 h-7 text-[#4d4d4d] group-hover:text-white transition-all duration-200' />
       </button>
+
+      <AuthRequiredModel
+        isOpen={isAuthModelOpen}
+        onClose={() => setIsAuthModelOpen(false)}
+      />
     </header>
   );
 }

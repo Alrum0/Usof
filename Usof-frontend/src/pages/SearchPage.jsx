@@ -1,3 +1,3 @@
 export default function SearchPage() {
-  return <div>SEARCH</div>;
+  return <div className='text-white'>SEARCH</div>;
 }
