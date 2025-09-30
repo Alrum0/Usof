@@ -12,6 +12,9 @@ export default defineConfig({
       svgrOptions: {
         icon: true,
       },
+      define: {
+        'process.env': {},
+      },
     }),
   ],
 });

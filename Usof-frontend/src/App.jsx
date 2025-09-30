@@ -1,21 +1,35 @@
-import { BrowserRouter } from 'react-router-dom';
-import AppRouter from './components/AppRouter';
 import './index.css';
-import Header from './components/Header';
-import LoginButton from './components/LogginButton';
-import NewPostButton from './components/NewPostButton';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import { NotificationProvider } from './context/NotificationContext';
+
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+
+import {
+  FORGOT_PASSWORD_ROUTE,
+  LOGIN_ROUTE,
+  REGISTER_ROUTE,
+} from './utils/consts';
+import LayoutWithHeader from './components/LayoutWithHeader';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div className='flex'>
-        <Header />
-        <main className='flex-1 ml-20'>
-          <LoginButton />
-          <NewPostButton />
-          <AppRouter />
-        </main>
-      </div>
-    </BrowserRouter>
+    <NotificationProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/*' element={<LayoutWithHeader />} />
+
+          <Route path={LOGIN_ROUTE} element={<LoginPage />} />
+          <Route path={REGISTER_ROUTE} element={<RegisterPage />} />
+          <Route
+            path={FORGOT_PASSWORD_ROUTE}
+            element={<ForgotPasswordPage />}
+          />
+        </Routes>
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }

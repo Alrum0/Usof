@@ -24,7 +24,8 @@ const generateJwt = (id, email, role) => {
 class AuthControllers {
   async registration(req, res, next) {
     try {
-      const { fullName, email, password, login, confirmPassword } = req.body;
+      const { fullName, email, password, role, login, confirmPassword } =
+        req.body;
 
       if (!email || !password) {
         return next(ApiError.badRequest('Incorrect email or password'));
@@ -56,6 +57,7 @@ class AuthControllers {
         login,
         password: hashPassword,
         isVeriffied: false,
+        role: role || 'USER',
       });
       await sendVerificationEmail(user);
 

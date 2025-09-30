@@ -17,7 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(globalLimiter);
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
 
 app.use(fileUpload({}));
 app.use(express.static(path.resolve(__dirname, 'static')));

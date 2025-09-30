@@ -1,5 +1,5 @@
 import Logov2 from '../assets/Icon/Logo.png';
-import { LOGIN_ROUTE } from '../utils/consts';
+import { REGISTER_ROUTE } from '../utils/consts';
 
 export default function AuthRequiredModel({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -23,7 +23,7 @@ export default function AuthRequiredModel({ isOpen, onClose }) {
         </div>
         <div className='text-center pt-12 relative'>
           <a
-            href={LOGIN_ROUTE}
+            href={REGISTER_ROUTE}
             className='px-16 py-6 border border-[var(--color-background-secondary)] rounded-lg text-white font-semibold'
           >
             Авторизуватись

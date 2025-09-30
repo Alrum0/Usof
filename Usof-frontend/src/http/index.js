@@ -1,11 +1,13 @@
 import axios from 'axios';
+import { useNotification } from '../context/NotificationContext';
 
 const $host = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  //baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'http://localhost:3000/api',
 });
 
 const $authHost = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: 'http://localhost:3000/api',
   withCredentials: true,
 });
 
@@ -15,6 +17,31 @@ const authinterceptor = (config) => {
   )}`;
   return config;
 };
+
+// let showNotificationCallback = null;
+// export const setNotificationCallback = (callback) => {
+//   showNotificationCallback = callback;
+// };
+
+// const setupresponseInterceptor = (instance) => {
+//   instance.interceptors.response.use(
+//     (response) => {
+//       if (response.data.message && showNotificationCallback) {
+//         showNotificationCallback(response.data.message);
+//       }
+//       return response;
+//     },
+//     (error) => {
+//       if (error.response?.data?.message && showNotificationCallback) {
+//         showNotificationCallback(error.response.data.message);
+//       }
+//       return Promise.reject(error);
+//     }
+//   );
+// };
+
+// setupresponseInterceptor($host);
+// setupresponseInterceptor($authHost);
 
 $authHost.interceptors.request.use(authinterceptor);
 $authHost.interceptors.response.use(

@@ -4,6 +4,8 @@
   --color-background: #0a0a0a;
   --color-background-secondary: #1d1d1d;
   --color-notification: #101010;
+  --color-border: #313131;
+  --color-text: #5a5a5a;
 }
 
 body {
