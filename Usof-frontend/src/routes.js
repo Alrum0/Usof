@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 import {
   ADMIN_ROUTE,
@@ -14,6 +15,7 @@ import {
   PROFILE_ROUTE,
   REGISTER_ROUTE,
   SEARCH_ROUTE,
+  VERIFY_EMAIL_ROUTE,
 } from './utils/consts';
 
 export const authRoutes = [
@@ -47,5 +49,9 @@ export const publicRoutes = [
   {
     path: PROFILE_ROUTE + '/:id',
     Component: ProfilePage,
+  },
+  {
+    path: VERIFY_EMAIL_ROUTE,
+    Component: VerifyEmailPage,
   },
 ];

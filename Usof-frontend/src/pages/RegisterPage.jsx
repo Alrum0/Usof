@@ -1,22 +1,26 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { registration } from '../http/authAPI';
 import { useNotification } from '../context/NotificationContext';
+import { useNavigate } from 'react-router-dom';
+
+import { LOGIN_ROUTE, VERIFY_EMAIL_ROUTE } from '../utils/consts';
 
 export default function RegisterPage() {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      console.log(fullName, login, email, password, confirmPassword);
-
       const response = await registration(
         fullName,
         login,
@@ -24,16 +28,21 @@ export default function RegisterPage() {
         password,
         confirmPassword
       );
-      showNotification(response.message);
+
+      if (response.status === 200) {
+        navigate(VERIFY_EMAIL_ROUTE);
+      }
     } catch (err) {
       showNotification(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <section
       className=' h-screen bg-cover'
-      // style={{ backgroundImage: `url('/bg/bg.png')` }}
+      // style={{ backgroundImage: `url('/bg/bg4.png')` }}
     >
       <div className='flex justify-center items-center h-full'>
         <div className='flex flex-col gap-4 p-10'>
@@ -83,6 +92,15 @@ export default function RegisterPage() {
           >
             Зареєструватись
           </button>
+          <div className='relative'>
+            <hr className='text-white mt-2 relative ' />
+            <span className='absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white'>
+              або
+            </span>
+          </div>
+          <div className='text-white text-center mt-2'>
+            <a href={LOGIN_ROUTE}>Увійти</a>
+          </div>
         </div>
       </div>
     </section>

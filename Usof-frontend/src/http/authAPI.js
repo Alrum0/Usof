@@ -7,7 +7,7 @@ export const registration = async (
   password,
   confirmPassword
 ) => {
-  const { data } = await $host.post('/auth/register', {
+  return await $host.post('/auth/register', {
     fullName,
     login,
     email,
@@ -15,10 +15,4 @@ export const registration = async (
     confirmPassword,
     role: 'ADMIN',
   });
-  return data;
-};
-
-export const login = async (email, password) => {
-  const { data } = await $host.post('/auth/login', { email, password });
-  localStorage.setItem('accessToken', data.accessToken);
 };

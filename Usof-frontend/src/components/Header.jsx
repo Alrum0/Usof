@@ -12,6 +12,7 @@ import AuthRequiredModel from '../components/AuthRequiredModel';
 
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import {
   ADMIN_ROUTE,
@@ -22,8 +23,8 @@ import {
 
 export default function Header() {
   const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
-  const isAdmin = false;
-  const isAuth = false;
+  const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
+  const isAuth = useSelector((state) => state.auth.isAuth);
 
   const handleProtectedAction = () => {
     if (!isAuth) {

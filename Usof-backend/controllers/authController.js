@@ -61,11 +61,14 @@ class AuthControllers {
       });
       await sendVerificationEmail(user);
 
-      return res.json({
+      return res.status(200).json({
         message: 'Please check your email to confirm account',
       });
     } catch (err) {
       console.error(err);
+      return res.status(500).json({
+        message: 'Internal server error',
+      });
     }
   }
   async login(req, res, next) {
@@ -268,7 +271,90 @@ class AuthControllers {
 
       await User.update(user.id, { isVeriffied: true });
 
-      return res.json({ message: 'Email verified successfully' });
+      res.send(
+        `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Document</title>
+          </head>
+          <style>
+              body{
+                  background-color: #0a0a0a;
+                  width: 100vw;
+                  height: 100vh;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  margin: 0;
+              }
+              section {
+                  background-color: #1d1d1d;
+                  border-radius: 10px;
+                  border-color: #313131;
+                  border-style: solid;
+                  border-width: 1px;
+                  padding: 20px;
+              }
+
+              .title{
+                  color: green;
+                  text-align: center;
+                  font-family: Arial, sans-serif;
+                  font-weight: 500;
+                  margin: 0;
+              }
+
+              .sub-title{
+                  color: #5a5a5a;
+                  text-align: center;
+                  font-family: Arial, sans-serif;
+                  font-weight: 300;
+                  margin-top: 20px;
+              }
+
+              .button-link {
+                  width: 100%;
+                  max-width: 100%;
+                  box-sizing: border-box;
+                  background-color: white;
+                  color: #5a5a5a;
+                  text-align: center;
+                  padding: 10px;
+                  border-radius: 5px;
+                  text-decoration: none;
+                  display: inline-block;
+                  font-family: Arial, sans-serif;
+                  font-weight: 500;
+                  margin-top: 10px;
+                  cursor: pointer;
+
+              }
+
+              .container {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  padding: 10px;
+                  width: 350px;
+              }
+
+
+          </style>
+          <body>
+              <section>
+                  <div class="container">
+                      <h1 class="title">Success</h1>
+                      <p class="sub-title">Email is verified successfully, You can login now.</p>
+                      <a href="${process.env.CLIENT_URL}" class="button-link">Login</a>
+                  </div>
+              </section>
+          </body>
+          </html>
+        `
+      );
     } catch (err) {
       next(ApiError.badRequest('Invalid token or expired token'));
       console.error(err);

@@ -11,7 +11,7 @@ export function NotificationProvider({ children }) {
 
     setNotification((prev) => {
       if (prev) {
-        return { ...prev, isOpen: false }; // спочатку закриваємо старе
+        return { ...prev, isOpen: false };
       }
       return { id, message, isOpen: true };
     });

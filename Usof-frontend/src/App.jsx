@@ -7,11 +7,13 @@ import { NotificationProvider } from './context/NotificationContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 import {
   FORGOT_PASSWORD_ROUTE,
   LOGIN_ROUTE,
   REGISTER_ROUTE,
+  VERIFY_EMAIL_ROUTE,
 } from './utils/consts';
 import LayoutWithHeader from './components/LayoutWithHeader';
 
@@ -28,6 +30,7 @@ export default function App() {
             path={FORGOT_PASSWORD_ROUTE}
             element={<ForgotPasswordPage />}
           />
+          <Route path={VERIFY_EMAIL_ROUTE} element={<VerifyEmailPage />} />
         </Routes>
       </BrowserRouter>
     </NotificationProvider>
