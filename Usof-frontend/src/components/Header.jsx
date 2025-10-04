@@ -1,4 +1,4 @@
-import Logov2 from '../assets/Icon/Logo.png';
+import Logov2 from '../assets/Icon/Logo2.png';
 
 import HomeIcon from '../assets/Icon/home-icon.svg?react';
 import SearchIcon from '../assets/Icon/search-icon.svg?react';
@@ -14,6 +14,8 @@ import CreatePostModel from './CreatePostModel';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { logout } from '../store/authSlice';
+import { useDispatch } from 'react-redux';
 
 import {
   ADMIN_ROUTE,
@@ -25,9 +27,12 @@ import {
 export default function Header() {
   const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isExitModelOpen, setIsExitModelOpen] = useState(false);
 
   const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isAuth = useSelector((state) => state.auth.isAuth);
+
+  const dispatch = useDispatch();
 
   const handleProtectedAction = () => {
     if (!isAuth) {
@@ -151,9 +156,29 @@ export default function Header() {
             )}
           </ul>
         </nav>
-        <button className='group rounded-lg hover:bg-[var(--color-background-secondary)] px-3.5 py-2 transition-all duration-200 cursor-pointer'>
+        <button
+          onClick={() => setIsExitModelOpen((prev) => !prev)}
+          className='group rounded-lg hover:bg-[var(--color-background-secondary)] px-3.5 py-2 transition-all duration-200 cursor-pointer realative'
+        >
           <MoreVertical className='w-7 h-7 text-[#4d4d4d] group-hover:text-white transition-all duration-200' />
         </button>
+        {isExitModelOpen && (
+          <div className='absolute bottom-12 left-20 mt-12 w-48 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-lg shadow-lg hover:bg-[var(--color-background-secondary)]'>
+            <ul className='py-2'>
+              <li>
+                <button
+                  onClick={() => {
+                    dispatch(logout());
+                    setIsExitModelOpen(false);
+                  }}
+                  className='block w-full px-4 py-2 text-sm text-red-600  text-center'
+                >
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        )}
 
         <AuthRequiredModel
           isOpen={isAuthModelOpen}

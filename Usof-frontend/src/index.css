@@ -20,3 +20,7 @@ img {
 .unselectable {
   user-select: none;
 }
+
+.scrollbar-no-track::-webkit-scrollbar-track {
+  background: transparent;
+}

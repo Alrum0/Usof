@@ -68,8 +68,28 @@ export const uploadAvatar = createAsyncThunk(
   }
 );
 
+let userFromToken = null;
+const tokenFromStorage = localStorage.getItem('accessToken');
+
+if (tokenFromStorage) {
+  try {
+    const decoded = jwtDecode(tokenFromStorage);
+    userFromToken = {
+      id: decoded.id,
+      role: decoded.role,
+      email: decoded.email,
+      fullName: '',
+      login: '',
+      avatar: '',
+    };
+  } catch (err) {
+    console.error('Invalid token', err);
+    localStorage.removeItem('accessToken');
+  }
+}
+
 const initialState = {
-  user: null,
+  user: userFromToken,
   accessToken: localStorage.getItem('accessToken') || null,
   isAuth: !!localStorage.getItem('accessToken'),
   loading: false,

@@ -32,7 +32,7 @@ export default function CustomInput({
       placeholder={placeholder}
       className='w-full px-4 -mt-2 bg-transparent text-white outline-none placeholder:text-[var(--color-text)] resize-none overflow-hidden'
       rows={1}
-      style={{ minHeight: '40px', maxHeight: `${maxHeight}px` }}
+      style={{ minHeight: '20px', maxHeight: `${maxHeight}px` }}
     />
   );
 }

@@ -1,4 +1,4 @@
-import Logov2 from '../assets/Icon/Logo.png';
+import Logov2 from '../assets/Icon/Logo2.png';
 import { REGISTER_ROUTE } from '../utils/consts';
 
 export default function AuthRequiredModel({ isOpen, onClose }) {
@@ -26,7 +26,7 @@ export default function AuthRequiredModel({ isOpen, onClose }) {
             href={REGISTER_ROUTE}
             className='px-16 py-6 border border-[var(--color-background-secondary)] rounded-lg text-white font-semibold'
           >
-            Авторизуватись
+            Зареєструйтесь
           </a>
         </div>
       </div>
