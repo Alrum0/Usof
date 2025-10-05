@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(globalLimiter);
+
 app.use(cookieParser());
 app.use(
   cors({
@@ -28,6 +28,10 @@ app.use(fileUpload({}));
 app.use(express.static(path.resolve(__dirname, 'static')));
 app.use('/api', router);
 app.use(errorHandler);
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(globalLimiter);
+}
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Server works!' });

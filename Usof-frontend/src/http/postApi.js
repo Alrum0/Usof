@@ -33,3 +33,13 @@ export const getAllPosts = async () => {
     throw err;
   }
 };
+
+export const getPostsByUser = async (userId) => {
+  try {
+    const response = await $authHost.get(`/api/posts/user/${userId}`);
+    return response.data.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

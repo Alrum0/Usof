@@ -1,10 +1,12 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 import Logo from '../assets/Profile/Logo.jpg';
+
 import MoreHorizontalIcon from '../assets/Icon/more-horizontal-icon.svg?react';
 import LikeIcon from '../assets/Icon/like-icon.svg?react';
 import MessageIcon from '../assets/Icon/message-icon.svg?react';
 import RepostIcon from '../assets/Icon/repost-icon.svg?react';
 
+import { timeAgo } from '../utils/DateTime';
 import { useState } from 'react';
 
 export default function PostModel({ post }) {
@@ -37,12 +39,14 @@ export default function PostModel({ post }) {
       <div className='flex justify-between '>
         <div className='flex items-center '>
           <img
-            src={post.authorAvatar}
+            src={`${BASE_URL}/${post.authorAvatar}`}
             alt='Logo'
             className='w-10 h-10 rounded-full flex-shrink-0'
           />
           <span className='text-white font-medium pl-3'>{post.authorName}</span>
-          <span className='text-[var(--color-text)] pl-2'>14 год</span>
+          <span className='text-[var(--color-text)] pl-2'>
+            {timeAgo(post.publishDate)}
+          </span>
         </div>
         <button className='cursor-pointer'>
           <MoreHorizontalIcon className='w-5 h-5' />
@@ -50,7 +54,7 @@ export default function PostModel({ post }) {
       </div>
 
       <div className='ml-13'>
-        <div className='mt-1'>
+        <div className='-mt-1'>
           <h2 className='text-white font-semibold'>{post.title}</h2>
           <p className='text-white text-[15px] mt-2 mb-1'>{post.content}</p>
         </div>

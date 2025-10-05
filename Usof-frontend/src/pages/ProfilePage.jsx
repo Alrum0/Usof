@@ -1,8 +1,38 @@
 import Logo from '../assets/Profile/Logo.jpg';
+import VerifiedIcon from '../assets/Icon/verified.png';
+import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
+
+import { useState, useEffect } from 'react';
+import { getPostsByUser } from '../http/postApi';
+import { useNotification } from '../context/NotificationContext';
+import { useSelector } from 'react-redux';
 
 import NewPostInput from '../components/NewPostInput';
+import PostModel from '../components/PostModel';
 
 export default function ProfilePage() {
+  const [posts, setPosts] = useState([]);
+  const userId = useSelector((state) => state.auth.user.id);
+  const { showNotification } = useNotification();
+
+  // const isVerified = useSelector((state) => state.auth.user.isVerified);
+  const isVerified = true;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const userPosts = await getPostsByUser(userId);
+        setPosts(Array.isArray(userPosts) ? userPosts : []);
+      } catch (err) {
+        showNotification(
+          err?.response?.data?.message || 'Error fetching posts'
+        );
+      }
+    };
+
+    fetchPosts();
+  }, [userId]);
+
   return (
     <section className='flex justify-center items-center flex-col'>
       <div className='mt-10'>
@@ -16,12 +46,19 @@ export default function ProfilePage() {
               staviyskiiandrii
             </h3>
           </div>
-          <div>
+          <div className='relative w-22 h-22'>
             <img
               src={Logo}
               alt='logo profile'
-              className='w-22 h-22 rounded-full'
+              className='w-22 h-22 rounded-full object-cover'
             />
+            {isVerified && (
+              <img
+                src={VerifyAdminIcon}
+                alt='verified'
+                className='absolute -bottom-1 -left-1 w-7 h-7'
+              />
+            )}
           </div>
         </div>
 
@@ -51,6 +88,11 @@ export default function ProfilePage() {
         </div>
         <div className='mt-4'>
           <NewPostInput />
+        </div>
+        <div>
+          {posts.map((post) => (
+            <PostModel key={post.id} post={post} />
+          ))}
         </div>
       </div>
     </section>

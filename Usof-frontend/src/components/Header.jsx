@@ -31,6 +31,7 @@ export default function Header() {
 
   const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isAuth = useSelector((state) => state.auth.isAuth);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   const dispatch = useDispatch();
 
@@ -117,7 +118,7 @@ export default function Header() {
             </li>
             <li>
               <NavLink
-                to={PROFILE_ROUTE + '/1'}
+                to={PROFILE_ROUTE + `/${userId}`}
                 onClick={(e) => {
                   if (!isAuth) {
                     e.preventDefault();

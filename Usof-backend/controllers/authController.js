@@ -50,6 +50,8 @@ class AuthControllers {
         return next(ApiError.badRequest('User with this login already exists'));
       }
 
+      login = login.toLowerCase();
+
       const hashPassword = await bcrypt.hash(password, 5);
       const user = await User.create({
         fullName,

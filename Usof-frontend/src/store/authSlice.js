@@ -68,6 +68,18 @@ export const uploadAvatar = createAsyncThunk(
   }
 );
 
+export const getUser = createAsyncThunk('auth/getUser', async (_, thunkAPI) => {
+  try {
+    const id = thunkAPI.getState().auth.user?.id;
+    const response = await $authHost.get(`/user/${id}`);
+    return response.data;
+  } catch (err) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || { message: 'Error', status: 500 }
+    );
+  }
+});
+
 let userFromToken = null;
 const tokenFromStorage = localStorage.getItem('accessToken');
 
@@ -81,6 +93,7 @@ if (tokenFromStorage) {
       fullName: '',
       login: '',
       avatar: '',
+      isOfficial: false,
     };
   } catch (err) {
     console.error('Invalid token', err);
@@ -150,6 +163,22 @@ const authSlice = createSlice({
         state.user.avatar = action.payload.avatar;
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      })
+
+      // Get User
+
+      .addCase(getUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+        state.user.isOfficial = action.payload.isOfficial;
+      })
+      .addCase(getUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
       });

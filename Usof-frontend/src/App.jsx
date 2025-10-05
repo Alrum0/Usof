@@ -3,6 +3,9 @@ import './index.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { NotificationProvider } from './context/NotificationContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUser } from './store/authSlice';
+import { useEffect } from 'react';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';

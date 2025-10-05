@@ -32,7 +32,7 @@ class Posts extends BaseModel {
         p.title,
         p.content,
         p.publishDate,
-        u.fullName AS authorName,
+        u.login AS authorName,
         u.avatar AS authorAvatar,
         COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
@@ -115,6 +115,34 @@ class Posts extends BaseModel {
     );
 
     return rows[0] || null;
+  }
+
+  async findByAuthorId(authorId) {
+    const [rows] = await db.query(
+      `
+      SELECT 
+        p.id,
+        p.title,
+        p.content,
+        p.publishDate,
+        u.login AS authorName,
+        u.avatar AS authorAvatar,
+        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+        COUNT(DISTINCT l.id) AS likes_count,
+        COALESCE(SUM(ps.stars), 0) AS stars
+      FROM posts p
+      JOIN users u ON p.authorId = u.id
+      LEFT JOIN post_image pi ON pi.postId = p.id
+      LEFT JOIN likes l ON l.postId = p.id
+      LEFT JOIN post_stars ps ON ps.postId = p.id
+      WHERE p.authorId = ?
+      GROUP BY p.id
+      ORDER BY p.publishDate DESC
+    `,
+      [authorId]
+    );
+
+    return rows;
   }
 }
 

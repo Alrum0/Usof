@@ -373,6 +373,24 @@ class PostControllers {
       );
     }
   }
+  async getAllPostsByUser(req, res, next) {
+    try {
+      const { user_id } = req.params;
+
+      const posts = await Post.findByAuthorId(user_id);
+
+      return res.json({
+        page: 1,
+        limit: posts.length,
+        total: posts.length,
+        totalPages: 1,
+        data: posts,
+      });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch user posts'));
+    }
+  }
 }
 
 module.exports = new PostControllers();

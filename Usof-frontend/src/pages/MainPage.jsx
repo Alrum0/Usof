@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+
 import { useEffect, useState } from 'react';
 import { getAllPosts } from '../http/postApi';
 import { useNotification } from '../context/NotificationContext';

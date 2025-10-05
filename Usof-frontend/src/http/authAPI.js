@@ -7,7 +7,7 @@ export const registration = async (
   password,
   confirmPassword
 ) => {
-  return await $host.post('/auth/register', {
+  return await $host.post('/api/auth/register', {
     fullName,
     login,
     email,
