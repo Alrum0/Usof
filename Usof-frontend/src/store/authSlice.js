@@ -6,7 +6,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }, thunkAPI) => {
     try {
-      const response = await $host.post('/auth/login', { email, password });
+      const response = await $host.post('/api/auth/login', { email, password });
       const token = response.data.accessToken;
       localStorage.setItem('accessToken', token);
 

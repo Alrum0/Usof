@@ -3,26 +3,29 @@ import ChevronRight from '../assets/Icon/chevron-right.svg?react';
 import PlusIcon from '../assets/Icon/plus-icon.svg?react';
 import ImageIcon from '../assets/Icon/image-icon.svg?react';
 
+import { createPost } from '../http/postApi';
 import { useState } from 'react';
+import { useNotification } from '../context/NotificationContext';
 
 import CustomSelect from './CustomSelect';
 import CustomInput from './CustomInput';
 
 export default function CreatePostModel({ isOpen, onClose }) {
   const [image, setImage] = useState([]);
-  const [category, setCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const { showNotification } = useNotification();
 
   if (!isOpen) return null;
 
-  const categories = [
-    { value: 'tech', label: 'Технології' },
-    { value: 'science', label: 'Наука' },
-    { value: 'art', label: 'Мистецтво' },
-  ];
+  const isFormValid =
+    categories.length > 0 && title.trim() !== '' && text.trim() !== '';
 
-  const handleCategorySelect = (selectedOption) => {
-    alert(`Ви обрали категорію: ${selectedOption.label}`);
-    setCategory(selectedOption.label);
+  const handleCategorySelect = (selectedCategories) => {
+    setCategories(selectedCategories);
   };
 
   const handleImageChange = (e) => {
@@ -34,14 +37,48 @@ export default function CreatePostModel({ isOpen, onClose }) {
     setImage((prev) => [...prev, ...newImages]);
   };
 
+  const handleCloseModal = () => {
+    onClose();
+    setText('');
+    setTitle('');
+    setImage([]);
+    setCategories([]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const categoryIds = categories.map((cat) => cat.id);
+      const response = await createPost(title, text, image, categoryIds);
+
+      if (response.status === 200) {
+        showNotification(response.data.message);
+        onClose();
+        setText('');
+        setTitle('');
+        setImage([]);
+        setCategories([]);
+      }
+    } catch (err) {
+      showNotification(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className=' ml-20 fixed inset-0 z-50'>
-      <div className='absolute inset-0 bg-black opacity-50' onClick={onClose} />
+      <div
+        className='absolute inset-0 bg-black opacity-50'
+        onClick={handleCloseModal}
+      />
 
       <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-background-profile)] rounded-lg border border-[var(--color-border)] w-[48%] px-8 py-4 flex flex-col'>
         <div className='flex gap-44 items-center'>
           <button
-            onClick={onClose}
+            onClick={handleCloseModal}
             className='text-white text-base cursor-pointer'
           >
             Скасувати
@@ -51,25 +88,40 @@ export default function CreatePostModel({ isOpen, onClose }) {
 
         <hr className='border-[var(--color-border)] my-4 -mx-8' />
 
-        <div className='flex'>
+        <div className='flex items-center gap-3'>
           <img
             src={Logo}
             alt='logo профілю'
-            className='w-10 h-10 rounded-full flex-shrink-0'
+            className='w-10 h-10 rounded-full flex-shrink-0 mt-1'
           />
-          <div className='flex items-center gap-1'>
-            <span className='text-white text-base font-normal ml-4 flex-shrink-0'>
-              staviyskiiandrii
-            </span>
-            <ChevronRight className='w-4 h-4 text-white flex-shrink-0' />
-            <CustomSelect
-              options={categories}
-              onSelect={handleCategorySelect}
+
+          <div className='flex-1'>
+            <div className='flex items-center gap-2'>
+              <span className='text-white text-base font-medium'>
+                staviyskiiandrii
+              </span>
+              <ChevronRight className='w-4 h-4 text-white flex-shrink-0' />
+              <CustomSelect onSelect={handleCategorySelect} />
+            </div>
+
+            <input
+              type='text'
+              className='outline-none placeholder:text-[var(--color-text)] text-white w-full bg-transparent'
+              placeholder='Що у вас на думці?'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
         </div>
-        <div className='ml-10'>
-          <CustomInput placeholder='Що нового?' />
+
+        <hr className='border-[var(--color-border)] mt-3 -mx-9' />
+
+        <div className='ml-10 mt-6'>
+          <CustomInput
+            placeholder='Що нового?'
+            value={text}
+            onChange={setText}
+          />
         </div>
 
         {image.length > 0 && (
@@ -78,7 +130,7 @@ export default function CreatePostModel({ isOpen, onClose }) {
               scrollbarWidth: 'thin',
               scrollbarColor: 'transparent',
             }}
-            className={`flex gap-3 ml-12 overflow-x-auto scrollbar-thin scrollbar-gray-600 ${
+            className={`flex gap-3 justify-start ml-12 overflow-x-auto scrollbar-thin scrollbar-gray-600 ${
               image.length === 1 ? 'justify-center' : ''
             }`}
           >
@@ -130,11 +182,17 @@ export default function CreatePostModel({ isOpen, onClose }) {
           <span className='text-[var(--color-text)]'>
             Будь-хто може відповідати й цитувати
           </span>
-          {categories.length > 0 && (
-            <button className='bg-[var(--color-accent)] text-white px-4 py-2 rounded-lg font-semibold border border-[var(--color-border)]'>
-              Опублікувати
-            </button>
-          )}
+          <button
+            onClick={handleSubmit}
+            className={`bg-[var(--color-accent)] px-4 py-2 rounded-lg font-semibold border ${
+              isFormValid
+                ? 'text-white border-[var(--color-border)] cursor-pointer'
+                : 'border-[var(--color-border)] text-[var(--color-text)]'
+            }`}
+            disabled={!isFormValid}
+          >
+            Опублікувати
+          </button>
         </div>
       </div>
     </section>

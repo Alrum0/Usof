@@ -145,16 +145,16 @@ class PostControllers {
         : [req.body.categories];
 
       if (!title || !content) {
-        return next(ApiError.badRequest('Ttile and content are required'));
+        return next(ApiError.badRequest('Title and content are required'));
       }
 
-      if (!req.files || !req.files.image) {
-        return next(ApiError.badRequest('No file uploaded'));
-      }
+      let images = [];
 
-      let images = Array.isArray(req.files.image)
-        ? req.files.image
-        : [req.files.image];
+      if (req.files && req.files.image) {
+        images = Array.isArray(req.files.image)
+          ? req.files.image
+          : [req.files.image];
+      }
 
       const post = await Post.create({
         title,

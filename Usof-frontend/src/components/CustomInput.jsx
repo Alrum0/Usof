@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 
 export default function CustomInput({
   placeholder,
+  value,
   onChange,
   maxHeight = 200,
 }) {
-  const [value, setValue] = useState('');
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -18,10 +18,7 @@ export default function CustomInput({
 
   const handleChange = (e) => {
     const newValue = e.target.value;
-    setValue(newValue);
-    if (onChange) {
-      onChange(newValue);
-    }
+    onChange?.(newValue);
   };
 
   return (
@@ -30,7 +27,7 @@ export default function CustomInput({
       value={value}
       onChange={handleChange}
       placeholder={placeholder}
-      className='w-full px-4 -mt-2 bg-transparent text-white outline-none placeholder:text-[var(--color-text)] resize-none overflow-hidden'
+      className='w-full px-4 -mt-2  text-white outline-none placeholder:text-[var(--color-text)] resize-none overflow-hidden'
       rows={1}
       style={{ minHeight: '20px', maxHeight: `${maxHeight}px` }}
     />

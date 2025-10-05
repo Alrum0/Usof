@@ -25,7 +25,7 @@ $authHost.interceptors.response.use(
       originalConfig._retry = true;
 
       try {
-        const { data } = await $authHost.post('/auth/refresh');
+        const { data } = await $authHost.post('/api/auth/refresh');
         const newToken = data.accessToken;
 
         localStorage.setItem('accessToken', newToken);
@@ -50,7 +50,7 @@ $authHost.interceptors.response.use(
           });
         });
 
-        console.log('Token refreshed successfully');
+        alert('Token refreshed successfully');
         return $authHost(originalConfig);
       } catch (refreshError) {
         window.location.href = '/login';
