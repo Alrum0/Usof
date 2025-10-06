@@ -32,6 +32,7 @@ class Posts extends BaseModel {
         p.title,
         p.content,
         p.publishDate,
+        u.id AS authorId,
         u.login AS authorName,
         u.avatar AS authorAvatar,
         COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,

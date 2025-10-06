@@ -8,6 +8,8 @@ import RepostIcon from '../assets/Icon/repost-icon.svg?react';
 
 import { timeAgo } from '../utils/DateTime';
 import { useState } from 'react';
+import { PROFILE_ROUTE } from '../utils/consts';
+import { NavLink } from 'react-router-dom';
 
 export default function PostModel({ post }) {
   const [clickedLike, setClickedLike] = useState(false);
@@ -43,7 +45,12 @@ export default function PostModel({ post }) {
             alt='Logo'
             className='w-10 h-10 rounded-full flex-shrink-0'
           />
-          <span className='text-white font-medium pl-3'>{post.authorName}</span>
+          <NavLink
+            to={`${PROFILE_ROUTE}/${post.authorId}`}
+            className='text-white font-medium pl-3 hover:underline'
+          >
+            {post.authorName}
+          </NavLink>
           <span className='text-[var(--color-text)] pl-2'>
             {timeAgo(post.publishDate)}
           </span>

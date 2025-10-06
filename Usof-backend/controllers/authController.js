@@ -24,7 +24,7 @@ const generateJwt = (id, email, role) => {
 class AuthControllers {
   async registration(req, res, next) {
     try {
-      const { fullName, email, password, role, login, confirmPassword } =
+      let { fullName, email, password, role, login, confirmPassword } =
         req.body;
 
       if (!email || !password) {
