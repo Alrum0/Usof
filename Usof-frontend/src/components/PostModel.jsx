@@ -5,14 +5,46 @@ import MoreHorizontalIcon from '../assets/Icon/more-horizontal-icon.svg?react';
 import LikeIcon from '../assets/Icon/like-icon.svg?react';
 import MessageIcon from '../assets/Icon/message-icon.svg?react';
 import RepostIcon from '../assets/Icon/repost-icon.svg?react';
+import UserTooltipWrapper from './UserTooltipWrapper';
+
+import VerifiedIcon from '../assets/Icon/verified.png';
+import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 
 import { timeAgo } from '../utils/DateTime';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { PROFILE_ROUTE } from '../utils/consts';
 import { NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 export default function PostModel({ post }) {
   const [clickedLike, setClickedLike] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  // const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
+  const isAdmin = true;
+  const isOfficial = false;
+  const hoverTimer = useRef(null);
+  const leaveTimer = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (leaveTimer.current) {
+      clearTimeout(leaveTimer.current);
+    }
+
+    hoverTimer.current = setTimeout(() => {
+      setShowTooltip(true);
+    }, 600);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimer.current) {
+      clearTimeout(hoverTimer.current);
+    }
+
+    leaveTimer.current = setTimeout(() => {
+      setShowTooltip(false);
+    }, 400);
+  };
 
   const images = post.images
     ? post.images.filter(Boolean).map((img, index) => ({
@@ -25,17 +57,6 @@ export default function PostModel({ post }) {
     setClickedLike(!clickedLike);
   };
 
-  //   const image = [
-  //     {
-  //       id: 1,
-  //       preview: 'https://picsum.photos/1920/1080', // Приклад працюючого зображення
-  //     },
-  //     {
-  //       id: 2,
-  //       preview: 'https://picsum.photos/401/300', // Інше працююче зображення
-  //     },
-  //   ];
-
   return (
     <div className=' mt-5'>
       <div className='flex justify-between '>
@@ -45,12 +66,40 @@ export default function PostModel({ post }) {
             alt='Logo'
             className='w-10 h-10 rounded-full flex-shrink-0'
           />
-          <NavLink
-            to={`${PROFILE_ROUTE}/${post.authorId}`}
-            className='text-white font-medium pl-3 hover:underline'
+          <div
+            className='relative'
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
-            {post.authorName}
-          </NavLink>
+            <NavLink
+              to={`${PROFILE_ROUTE}/${post.authorId}`}
+              className='text-white font-medium pl-3 hover:underline'
+            >
+              {post.authorName}
+            </NavLink>
+
+            {showTooltip && (
+              <div className='absolute top-6 left-0 z-50'>
+                <UserTooltipWrapper
+                  userData={post}
+                  isVisible={showTooltip}
+                  onClose={() => setShowTooltip(false)}
+                />
+              </div>
+            )}
+          </div>
+          <div>
+            {(isAdmin || isOfficial) && (
+              <img
+                src={isAdmin ? VerifyAdminIcon : VerifiedIcon}
+                alt='verified'
+                className={`inline-block ml-1 cursor-none ${
+                  isAdmin ? 'w-4 h-4 -mt-0.5' : isOfficial ? 'w-6 h-6' : ''
+                }`}
+              />
+            )}
+          </div>
+
           <span className='text-[var(--color-text)] pl-2'>
             {timeAgo(post.publishDate)}
           </span>

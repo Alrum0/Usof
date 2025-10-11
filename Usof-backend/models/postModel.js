@@ -34,6 +34,7 @@ class Posts extends BaseModel {
         p.publishDate,
         u.id AS authorId,
         u.login AS authorName,
+        u.fullName AS authorFullName,
         u.avatar AS authorAvatar,
         COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
         COUNT(DISTINCT l.id) AS likes_count,

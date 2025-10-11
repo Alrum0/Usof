@@ -1,10 +1,14 @@
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 import Logo from '../assets/Profile/Logo.jpg';
 import ChevronRight from '../assets/Icon/chevron-right.svg?react';
 import PlusIcon from '../assets/Icon/plus-icon.svg?react';
 import ImageIcon from '../assets/Icon/image-icon.svg?react';
 
 import { createPost } from '../http/postApi';
-import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getUser } from '../http/userApi';
+import { useState, useEffect } from 'react';
 import { useNotification } from '../context/NotificationContext';
 
 import CustomSelect from './CustomSelect';
@@ -16,8 +20,28 @@ export default function CreatePostModel({ isOpen, onClose }) {
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const { showNotification } = useNotification();
+  const userId = useSelector((state) => state.auth.user.id);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+
+        const response = await getUser(userId);
+        setUserData(response.data);
+      } catch (err) {
+        showNotification(
+          err?.response?.data?.message || 'Error fetching posts'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, [userId]);
 
   if (!isOpen) return null;
 
@@ -90,7 +114,7 @@ export default function CreatePostModel({ isOpen, onClose }) {
 
         <div className='flex items-center gap-3'>
           <img
-            src={Logo}
+            src={`${BASE_URL}/${userData.avatar}`}
             alt='logo профілю'
             className='w-10 h-10 rounded-full flex-shrink-0 mt-1'
           />
@@ -98,7 +122,7 @@ export default function CreatePostModel({ isOpen, onClose }) {
           <div className='flex-1'>
             <div className='flex items-center gap-2'>
               <span className='text-white text-base font-medium'>
-                staviyskiiandrii
+                {userData.login}
               </span>
               <ChevronRight className='w-4 h-4 text-white flex-shrink-0' />
               <CustomSelect onSelect={handleCategorySelect} />

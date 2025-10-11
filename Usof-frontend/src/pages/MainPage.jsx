@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { getAllPosts } from '../http/postApi';
 import { useNotification } from '../context/NotificationContext';

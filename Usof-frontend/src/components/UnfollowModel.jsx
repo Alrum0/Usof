@@ -1,7 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-import { useNotification } from '../context/NotificationContext';
-
 export default function UnfollowModel({
   isOpen,
   onClose,
@@ -10,6 +8,19 @@ export default function UnfollowModel({
 }) {
   if (!isOpen) return null;
 
+  const getUserName = () => {
+    return (
+      userData?.authorName ||
+      userData?.login ||
+      userData?.username ||
+      'користувачем'
+    );
+  };
+
+  const getAvatar = () => {
+    return userData?.authorAvatar || userData?.avatar || 'default-avatar.jpg';
+  };
+
   return (
     <div className='fixed inset-0 z-50'>
       <div className='absolute inset-0 bg-black opacity-50' onClick={onClose} />
@@ -17,14 +28,14 @@ export default function UnfollowModel({
       <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-background-secondary)]  border border-[var(--color-border)] rounded-3xl px-5 flex-col justify-center w-80'>
         <div className='mt-6 flex justify-center'>
           <img
-            src={`${BASE_URL}/${userData?.avatar}`}
+            src={`${BASE_URL}/${getAvatar()}`}
             alt='avatar'
             className='h-16 w-16 rounded-full'
           />
         </div>
         <div className='mt-6 text-center'>
           <span className='text-white font-normal'>
-            Не стежити за {userData?.login}?
+            Не стежити за {getUserName()}?
           </span>
         </div>
         <div className='mt-6 flex justify-between -mx-5 border-t border-[var(--color-border)]'>

@@ -39,7 +39,7 @@ export default function NewPostInput() {
     <>
       <CreatePostModel isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <button
-        className='w-full flex items-center  text-left outline-none'
+        className='w-full flex items-center text-left outline-none'
         onClick={() => setIsOpen(true)}
       >
         <img
