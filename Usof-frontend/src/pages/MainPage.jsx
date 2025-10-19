@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAllPosts } from '../http/postApi';
 import { useNotification } from '../context/NotificationContext';
+import { useSelector } from 'react-redux';
 
 import NewPostInput from '../components/NewPostInput';
 import PostModel from '../components/PostModel';
@@ -10,6 +11,8 @@ export default function MainPage() {
   const [loading, setLoading] = useState(true);
 
   const { showNotification } = useNotification();
+
+  const isAuth = useSelector((state) => state.auth.isAuth);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -41,7 +44,7 @@ export default function MainPage() {
           <h1 className='text-xl font-bold text-white'>For You</h1>
         </div>
         <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-8 pt-4 w-1/2'>
-          <NewPostInput />
+          {isAuth && <NewPostInput />}
 
           {posts.map((post) => (
             <PostModel key={post.id} post={post} />

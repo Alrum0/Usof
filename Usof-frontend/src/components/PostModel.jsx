@@ -1,5 +1,4 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
-import Logo from '../assets/Profile/Logo.jpg';
 
 import MoreHorizontalIcon from '../assets/Icon/more-horizontal-icon.svg?react';
 import LikeIcon from '../assets/Icon/like-icon.svg?react';
@@ -20,9 +19,8 @@ export default function PostModel({ post }) {
   const [clickedLike, setClickedLike] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
-  const isAdmin = true;
-  const isOfficial = false;
+  const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
+  const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
   const hoverTimer = useRef(null);
   const leaveTimer = useRef(null);
 
@@ -89,15 +87,23 @@ export default function PostModel({ post }) {
             )}
           </div>
           <div>
-            {(isAdmin || isOfficial) && (
+            {isAdmin ? (
               <img
-                src={isAdmin ? VerifyAdminIcon : VerifiedIcon}
+                src={VerifyAdminIcon}
                 alt='verified'
-                className={`inline-block ml-1 cursor-none ${
+                className={`inline-block ml-1.5 cursor-none ${
+                  isAdmin ? 'w-4 h-4 -mt-1' : isOfficial ? 'w-6 h-6' : ''
+                }`}
+              />
+            ) : isOfficial ? (
+              <img
+                src={VerifiedIcon}
+                alt='verified'
+                className={`inline-block ml-1.5 cursor-none ${
                   isAdmin ? 'w-4 h-4 -mt-0.5' : isOfficial ? 'w-6 h-6' : ''
                 }`}
               />
-            )}
+            ) : null}
           </div>
 
           <span className='text-[var(--color-text)] pl-2'>

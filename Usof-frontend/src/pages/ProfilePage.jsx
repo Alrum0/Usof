@@ -1,7 +1,6 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-import Logo from '../assets/Profile/Logo.jpg';
-import VerifiedIcon from '../assets/Icon/verified.png';
+import VerifyOfficialIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 
 import { useState, useEffect } from 'react';
@@ -14,25 +13,29 @@ import {
   followUser,
   getFollowing,
   unfollowUser,
+  getFollowers,
 } from '../http/userApi';
 
 import NewPostInput from '../components/NewPostInput';
 import PostModel from '../components/PostModel';
 import UnfollowModel from '../components/UnfollowModel';
+import EditModel from '../components/EditModel';
 
 export default function ProfilePage() {
   const { showNotification } = useNotification();
   const { id } = useParams();
 
   const [posts, setPosts] = useState([]);
+  const [followers, setFollowers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [following, setFollowing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
 
-  const userId = useSelector((state) => state.auth.user.id);
-  // const isVerified = useSelector((state) => state.auth.user.isVerified);
-  const isVerified = true;
+  const userId = useSelector((state) => state.auth.user?.id);
+  const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
+  const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isSelf = userId === Number(id);
 
   const handleFollow = async () => {
@@ -95,6 +98,20 @@ export default function ProfilePage() {
     fetchPosts();
   }, [userId, id]);
 
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      try {
+        const followersResponse = await getFollowers(id);
+        setFollowers(followersResponse.data);
+      } catch (err) {
+        showNotification(
+          err?.response?.data?.message || 'Error fetching followers'
+        );
+      }
+    };
+    fetchFollowers();
+  }, [id]);
+
   return (
     <>
       <section className='flex justify-center items-center flex-col'>
@@ -117,25 +134,56 @@ export default function ProfilePage() {
                 alt='logo profile'
                 className='w-22 h-22 rounded-full object-cover'
               />
-              {isVerified && (
+              {isAdmin ? (
                 <img
                   src={VerifyAdminIcon}
                   alt='verified'
+                  className='absolute bottom-1 -left-2 w-7 h-7'
+                />
+              ) : isOfficial ? (
+                <img
+                  src={VerifyOfficialIcon}
+                  alt='verified'
                   className='absolute -bottom-1 -left-1 w-7 h-7'
                 />
-              )}
+              ) : null}
             </div>
           </div>
 
-          <div className='mt-2'>
-            <button className='text-[var(--color-text)] text-[14px] font-normal hover:underline cursor-pointer'>
-              252 followers
+          <div className='-mt-1 mr-20'>
+            <span style={{ whiteSpace: 'pre-line' }} className=' text-white'>
+              {userData?.biography}
+            </span>
+          </div>
+
+          <div className='mt-3'>
+            <button
+              className={`text-[var(--color-text)] text-[14px] font-normal hover:underline cursor-pointer flex ${
+                followers.length > 0 ? 'gap-1.5' : ''
+              }`}
+            >
+              <div className='flex -space-x-1.5 overflow-hidden items-center'>
+                {followers.slice(0, 3).map((follower, index) => {
+                  return (
+                    <img
+                      key={index}
+                      src={`${BASE_URL}/${follower.avatar}`}
+                      className='w-4.5 h-4.5 border border-[var(--color-border)] rounded-full'
+                    />
+                  );
+                })}
+              </div>
+              {followers.length} followers
             </button>
           </div>
           <div className='mt-6'>
             <button
               onClick={
-                isSelf ? null : following ? () => setIsOpen(true) : handleFollow
+                isSelf
+                  ? () => setIsOpenEdit(true)
+                  : following
+                  ? () => setIsOpen(true)
+                  : handleFollow
               }
               className={`text-x py-2 border border-[var(--color-border)] rounded-lg w-full cursor-pointer 
               ${
@@ -180,6 +228,10 @@ export default function ProfilePage() {
         onClose={() => setIsOpen(false)}
         userData={userData}
         handleUnfollow={handleUnfollow}
+      />
+      <EditModel
+        isOpen={isSelf && isOpenEdit}
+        onClose={() => setIsOpenEdit(false)}
       />
     </>
   );

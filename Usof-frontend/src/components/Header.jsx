@@ -1,4 +1,4 @@
-import Logov2 from '../assets/Icon/Logo2.png';
+import Logo from '../assets/Icon/Logo.png';
 
 import HomeIcon from '../assets/Icon/home-icon.svg?react';
 import SearchIcon from '../assets/Icon/search-icon.svg?react';
@@ -49,7 +49,7 @@ export default function Header() {
       <header className='fixed left-0 top-0 w-20 h-screen flex flex-col justify-between items-center py-6 transition-all duration-300 z-40'>
         <a href={MAIN_ROUTE}>
           <img
-            src={Logov2}
+            src={Logo}
             alt='Usof Logo'
             className='w-16 h-16 hover:scale-110 transition-all duration-300'
           />

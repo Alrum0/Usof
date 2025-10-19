@@ -15,12 +15,14 @@ export default function UserTooltipWrapper({ userData, isVisible, onClose }) {
   const tooltipRef = useRef(false);
   const unfollowMenuRef = useRef(false);
 
+  const targetId = userData?.authorId || userData?.id;
+
   useEffect(() => {
     const fetchFollow = async () => {
       try {
         setLoading(true);
         const res = await getFollowing(userId);
-        setFollowing(res.data.some((u) => u.id === Number(userData.authorId)));
+        setFollowing(res.data.some((u) => u.id === Number(targetId)));
       } catch (err) {
         showNotification(
           err?.response?.data?.message || 'Error fetching follow'
@@ -30,14 +32,14 @@ export default function UserTooltipWrapper({ userData, isVisible, onClose }) {
       }
     };
 
-    if (isVisible && userData?.authorId) {
+    if (isVisible && targetId) {
       fetchFollow();
     }
-  }, [userId, userData?.authorId, isVisible]);
+  }, [userId, targetId, isVisible]);
 
   const handleFollow = async () => {
     try {
-      const response = await followUser(userData.authorId);
+      const response = await followUser(targetId);
       showNotification(response.data.message);
       setFollowing(true);
     } catch (err) {
@@ -47,7 +49,7 @@ export default function UserTooltipWrapper({ userData, isVisible, onClose }) {
 
   const handleUnfollow = async () => {
     try {
-      const response = await unfollowUser(userData.authorId);
+      const response = await unfollowUser(targetId);
       showNotification(response.data.message);
       setFollowing(false);
       setIsUnfollowOpen(false);

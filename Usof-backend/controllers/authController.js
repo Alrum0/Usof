@@ -60,6 +60,7 @@ class AuthControllers {
         password: hashPassword,
         isVeriffied: false,
         role: role || 'USER',
+        avatar: '/default-avatar.jpg',
       });
       await sendVerificationEmail(user);
 

@@ -23,7 +23,7 @@ export default function CreatePostModel({ isOpen, onClose }) {
   const [userData, setUserData] = useState(null);
 
   const { showNotification } = useNotification();
-  const userId = useSelector((state) => state.auth.user.id);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   useEffect(() => {
     const fetchUser = async () => {

@@ -24,6 +24,8 @@ class UserControllers {
         fullName: user.fullName,
         isVeriffied: user.isVeriffied,
         rating: user.rating,
+        isOfficial: user.isOfficial,
+        biography: user.biography,
       };
       return res.json(publicData);
     } catch (err) {
@@ -118,24 +120,24 @@ class UserControllers {
     try {
       const userId = req.user.id;
 
-      if (req.user.role !== 'ADMIN' && req.user.id !== userId) {
-        return next(
-          ApiError.forbidden(
-            'You do not have permission to access this resource'
-          )
-        );
-      }
+      // if (req.user.role !== 'ADMIN' && req.user.id !== userId) {
+      //   return next(
+      //     ApiError.forbidden(
+      //       'You do not have permission to access this resource'
+      //     )
+      //   );
+      // }
 
-      if (!req.files || !req.files.img) {
+      if (!req.files || !req.files.avatar) {
         return next(ApiError.badRequest('No file uploaded'));
       }
 
-      const { img } = req.files;
+      const { avatar } = req.files;
 
       const fileName = uuid.v4() + '.webp';
       const filepath = path.resolve(__dirname, '..', 'static', fileName);
 
-      await sharp(img.data).webp({ quality: 80 }).toFile(filepath);
+      await sharp(avatar.data).webp({ quality: 80 }).toFile(filepath);
 
       const user = await User.findById(userId);
       if (!user) {
@@ -143,7 +145,7 @@ class UserControllers {
       }
 
       await User.update(userId, { avatar: fileName });
-      return res.json({ message: 'Avatar uploaded successfully' });
+      // return res.json({ message: 'Avatar uploaded successfully' });
     } catch (err) {
       console.error(err);
       next(ApiError.internal('Error uploading avatar'));
@@ -152,7 +154,7 @@ class UserControllers {
   async updateUser(req, res, next) {
     try {
       const { user_id } = req.params;
-      let { fullName, email, isOfficial, stars } = req.body;
+      let { fullName, email, isOfficial, stars, biography } = req.body;
 
       const user = await User.findById(user_id);
       if (!user) {
@@ -160,7 +162,7 @@ class UserControllers {
       }
 
       const isAdmin = req.user.role === 'ADMIN';
-      const isSelf = req.user.id === user.id;
+      const isSelf = req.user.id === parseInt(user_id);
 
       if (!isAdmin && !isSelf) {
         return next(
@@ -187,14 +189,19 @@ class UserControllers {
             return next(ApiError.badRequest('Field "email" cannot be empty'));
           }
 
-          const candidateEmail = await User.findOne({ email });
-          if (candidateEmail) {
-            return next(
-              ApiError.badRequest('User with this email already exists')
-            );
+          if (email !== user.email) {
+            const candidateEmail = await User.findOne({ email });
+            if (candidateEmail) {
+              return next(
+                ApiError.badRequest('User with this email already exists')
+              );
+            }
+            updateData.email = email;
           }
+        }
 
-          updateData.email = email;
+        if (biography !== undefined) {
+          updateData.biography = biography;
         }
       }
 
@@ -203,10 +210,7 @@ class UserControllers {
         if (stars !== undefined) updateData.stars = stars;
       }
 
-      if (
-        Object.keys(updateData).length < 0 ||
-        Object.keys(updateData).length === 0
-      ) {
+      if (Object.keys(updateData).length === 0) {
         return next(ApiError.badRequest('No fields to update'));
       }
 

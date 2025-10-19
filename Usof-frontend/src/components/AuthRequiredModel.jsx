@@ -1,4 +1,4 @@
-import Logov2 from '../assets/Icon/Logo2.png';
+import Logo from '../assets/Icon/Logo.png';
 import { REGISTER_ROUTE } from '../utils/consts';
 
 export default function AuthRequiredModel({ isOpen, onClose }) {
@@ -10,7 +10,7 @@ export default function AuthRequiredModel({ isOpen, onClose }) {
 
       <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-16 pt-10 pb-16 rounded-lg'>
         <div className='text-center'>
-          <img src={Logov2} alt='Usof Logo' className='w-12 h-12 mx-auto' />
+          <img src={Logo} alt='Usof Logo' className='w-12 h-12 mx-auto' />
           <h1 className='text-3xl font-bold text-white pt-6'>
             Зареєструйтесь, щоб <br />
             користуватись

@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS users
     avatar VARCHAR(512) DEFAULT NULL,
     rating INT DEFAULT 0,
     isOfficial BOOLEAN DEFAULT FALSE,
-    stars_balance INT DEFAULT 0
+    stars_balance INT DEFAULT 0,
+    biography TEXT
 );
 
 CREATE TABLE IF NOT EXISTS tokens
