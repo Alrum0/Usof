@@ -45,7 +45,7 @@ class PostControllers {
     try {
       const { post_id } = req.params;
 
-      const post = await Post.findPostWithImagesAndStars(post_id);
+      const post = await Post.findPostWithFullData(post_id);
       if (!post) {
         return next(ApiError.badRequest('Post not found'));
       }
@@ -58,8 +58,9 @@ class PostControllers {
   async getAllCommentsForPost(req, res, next) {
     try {
       const { post_id } = req.params;
+      const { sort, order } = req.query;
 
-      const comments = await Comment.findAll({ postId: post_id });
+      const comments = await Comment.findAllByPostId(post_id, sort, order);
       return res.json(comments);
     } catch (err) {
       console.error(err);

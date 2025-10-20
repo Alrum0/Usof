@@ -34,10 +34,46 @@ export const getAllPosts = async () => {
   }
 };
 
+export const getPostById = async (postId) => {
+  try {
+    const response = await $authHost.get(`/api/posts/${postId}`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 export const getPostsByUser = async (userId) => {
   try {
     const response = await $authHost.get(`/api/posts/user/${userId}`);
     return response.data.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const createLike = async (postId) => {
+  try {
+    const response = await $authHost.post(`/api/posts/${postId}/like`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getAllCommentsForPost = async (
+  postId,
+  sort = 'createdAt',
+  order = 'desc'
+) => {
+  try {
+    const response = await $authHost.get(
+      `/api/posts/${postId}/comments?sort=${sort}&order=${order}`
+    );
+    return response;
   } catch (err) {
     console.error(err);
     throw err;

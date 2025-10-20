@@ -116,7 +116,7 @@ export default function ProfilePage() {
     <>
       <section className='flex justify-center items-center flex-col'>
         <div className='mt-10'>
-          <h1 className='text-xl font-bold text-white'>Profile</h1>
+          <h1 className='text-xl font-bold text-white'>Профіль</h1>
         </div>
         <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-8 w-1/2'>
           <div className='flex justify-between items-center'>

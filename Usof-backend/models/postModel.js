@@ -72,6 +72,35 @@ class Posts extends BaseModel {
     return rows;
   }
 
+  async findPostWithFullData(postId) {
+    const [rows] = await db.query(
+      `
+    SELECT 
+      p.id,
+      p.title,
+      p.content,
+      p.publishDate,
+      u.id AS authorId,
+      u.login AS authorName,
+      u.fullName AS authorFullName,
+      u.avatar AS authorAvatar,
+      COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+      COUNT(DISTINCT l.id) AS likes_count,
+      COALESCE(SUM(ps.stars), 0) AS stars
+    FROM posts p
+    JOIN users u ON p.authorId = u.id
+    LEFT JOIN post_image pi ON pi.postId = p.id
+    LEFT JOIN likes l ON l.postId = p.id
+    LEFT JOIN post_stars ps ON ps.postId = p.id
+    WHERE p.id = ?
+    GROUP BY p.id
+    `,
+      [postId]
+    );
+
+    return rows[0] || null;
+  }
+
   async countAll() {
     const [[{ count }]] = await db.query(
       `SELECT COUNT(*) as count FROM ${this.tableName}`

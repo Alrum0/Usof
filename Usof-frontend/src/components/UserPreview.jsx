@@ -171,9 +171,6 @@ export default function UserPreview({ user }) {
             <h3 className='-mt-1 text-[var(--color-text)]'>{user.fullName}</h3>
           </div>
         </div>
-        {/* <button className='px-4 py-1 bg-white rounded-lg cursor-pointer z-50'>
-          <span className='text-black font-semibold'>Стежити</span>
-        </button> */}
 
         <button
           onClick={following ? () => setIsOpen(true) : handleFollow}

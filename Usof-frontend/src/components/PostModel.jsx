@@ -14,6 +14,8 @@ import { useState, useRef } from 'react';
 import { PROFILE_ROUTE } from '../utils/consts';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { POST_ROUTE } from '../utils/consts';
+import { createLike } from '../http/postApi';
 
 export default function PostModel({ post }) {
   const [clickedLike, setClickedLike] = useState(false);
@@ -44,23 +46,32 @@ export default function PostModel({ post }) {
     }, 400);
   };
 
-  const images = post.images
+  const images = post?.images
     ? post.images.filter(Boolean).map((img, index) => ({
         id: index,
         preview: `${BASE_URL}/${img}`,
       }))
     : [];
 
-  const handleLikeClick = () => {
+  const handleLikeClick = async (e) => {
+    e.stopPropagation();
+
+    await createLike(post.id).catch((err) => {
+      console.error('Error liking post:', err);
+    });
     setClickedLike(!clickedLike);
   };
 
+  const handlePostClick = () => {
+    window.location.href = `${POST_ROUTE}/${post.id}`;
+  };
+
   return (
-    <div className=' mt-5'>
+    <div className=' mt-5 cursor-pointer' onClick={handlePostClick}>
       <div className='flex justify-between '>
         <div className='flex items-center '>
           <img
-            src={`${BASE_URL}/${post.authorAvatar}`}
+            src={`${BASE_URL}/${post?.authorAvatar}`}
             alt='Logo'
             className='w-10 h-10 rounded-full flex-shrink-0'
           />
@@ -70,10 +81,10 @@ export default function PostModel({ post }) {
             onMouseLeave={handleMouseLeave}
           >
             <NavLink
-              to={`${PROFILE_ROUTE}/${post.authorId}`}
+              to={`${PROFILE_ROUTE}/${post?.authorId}`}
               className='text-white font-medium pl-3 hover:underline'
             >
-              {post.authorName}
+              {post?.authorName}
             </NavLink>
 
             {showTooltip && (
@@ -107,7 +118,7 @@ export default function PostModel({ post }) {
           </div>
 
           <span className='text-[var(--color-text)] pl-2'>
-            {timeAgo(post.publishDate)}
+            {timeAgo(post?.publishDate)}
           </span>
         </div>
         <button className='cursor-pointer'>
@@ -117,8 +128,8 @@ export default function PostModel({ post }) {
 
       <div className='ml-13'>
         <div className='-mt-1'>
-          <h2 className='text-white font-semibold'>{post.title}</h2>
-          <p className='text-white text-[15px] mt-2 mb-1'>{post.content}</p>
+          <h2 className='text-white font-semibold'>{post?.title}</h2>
+          <p className='text-white text-[15px] mt-2 mb-1'>{post?.content}</p>
         </div>
 
         {images.length > 0 && (
