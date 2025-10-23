@@ -101,6 +101,69 @@ class Posts extends BaseModel {
     return rows[0] || null;
   }
 
+  async findFollowingPosts(userId, limit, offset, sort) {
+    let orderBySql;
+
+    switch (sort) {
+      case 'likes_desc':
+        orderBySql = 'ORDER BY likes_count DESC';
+        break;
+      case 'likes_asc':
+        orderBySql = 'ORDER BY likes_count ASC';
+        break;
+      case 'date_asc':
+        orderBySql = 'ORDER BY p.publishDate ASC';
+        break;
+      case 'date_desc':
+      default:
+        orderBySql = 'ORDER BY p.publishDate DESC';
+        break;
+    }
+
+    const [rows] = await db.query(
+      `
+    SELECT 
+      p.id,
+      p.title,
+      p.content,
+      p.publishDate,
+      u.id AS authorId,
+      u.login AS authorName,
+      u.fullName AS authorFullName,
+      u.avatar AS authorAvatar,
+      COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+      COUNT(DISTINCT l.id) AS likes_count,
+      COALESCE(SUM(ps.stars), 0) AS stars
+    FROM posts p
+    JOIN users u ON p.authorId = u.id
+    INNER JOIN subscriptions s ON s.followingId = p.authorId
+    LEFT JOIN post_image pi ON pi.postId = p.id
+    LEFT JOIN likes l ON l.postId = p.id
+    LEFT JOIN post_stars ps ON ps.postId = p.id
+    WHERE s.followerId = ?
+    GROUP BY p.id
+    ${orderBySql}
+    LIMIT ? OFFSET ?
+    `,
+      [userId, limit, offset]
+    );
+
+    return rows;
+  }
+
+  async countFollowingPosts(userId) {
+    const [rows] = await db.query(
+      `
+    SELECT COUNT(*) AS count
+    FROM posts p
+    INNER JOIN subscriptions s ON s.followingId = p.authorId
+    WHERE s.followerId = ?
+    `,
+      [userId]
+    );
+    return rows[0]?.count || 0;
+  }
+
   async countAll() {
     const [[{ count }]] = await db.query(
       `SELECT COUNT(*) as count FROM ${this.tableName}`
@@ -121,10 +184,26 @@ class Posts extends BaseModel {
 
   async findFollowingPosts(userId) {
     const [rows] = await db.query(
-      `SELECT p.* 
+      `SELECT 
+        p.id,
+        p.title,
+        p.content,
+        p.publishDate,
+        u.id AS authorId,
+        u.login AS authorName,
+        u.fullName AS authorFullName,
+        u.avatar AS authorAvatar,
+        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+        COUNT(DISTINCT l.id) AS likes_count,
+        COALESCE(SUM(ps.stars), 0) AS stars
        FROM posts p
+       JOIN users u ON p.authorId = u.id
+       LEFT JOIN post_image pi ON pi.postId = p.id
+       LEFT JOIN likes l ON l.postId = p.id
+       LEFT JOIN post_stars ps ON ps.postId = p.id
        INNER JOIN subscriptions s ON p.authorId = s.followingId
        WHERE s.followerId = ?
+       GROUP BY p.id
        ORDER BY p.publishDate DESC`,
       [userId]
     );

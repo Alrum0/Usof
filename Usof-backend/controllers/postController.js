@@ -17,6 +17,10 @@ class PostControllers {
     try {
       let { limit, page, sort = 'date_desc' } = req.query;
 
+      // prevent caching so sorting changes are always fetched fresh
+      res.setHeader('Cache-Control', 'no-store');
+      console.debug(`getAllPosts called with sort=${sort}, page=${page}, limit=${limit}`);
+
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;
       let offset = page * limit - limit;
@@ -360,13 +364,29 @@ class PostControllers {
       return next(ApiError.badRequest('Failed to remove like'));
     }
   }
-
   async findFollowingPosts(req, res, next) {
     try {
       const userId = req.user.id;
+      let { limit, page, sort = 'date_desc' } = req.query;
 
-      const posts = await Post.findFollowingPosts(userId);
-      return res.json(posts);
+      // prevent caching so sorting changes are always fetched fresh
+      res.setHeader('Cache-Control', 'no-store');
+      console.debug(`findFollowingPosts called with userId=${userId}, sort=${sort}, page=${page}, limit=${limit}`);
+
+      page = parseInt(page) || 1;
+      limit = parseInt(limit) || 10;
+      const offset = page * limit - limit;
+
+      const posts = await Post.findFollowingPosts(userId, limit, offset, sort);
+      const total = await Post.countFollowingPosts(userId);
+
+      return res.json({
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        data: posts,
+      });
     } catch (err) {
       console.error(err);
       return next(
@@ -374,6 +394,7 @@ class PostControllers {
       );
     }
   }
+
   async getAllPostsByUser(req, res, next) {
     try {
       const { user_id } = req.params;
@@ -390,6 +411,19 @@ class PostControllers {
     } catch (err) {
       console.error(err);
       return next(ApiError.internal('Failed to fetch user posts'));
+    }
+  }
+
+  async getLikeStatus(req, res, next) {
+    try {
+      const { post_id } = req.params;
+      const userId = req.user.id;
+
+      const like = await Like.findOne({ userId, postId: post_id });
+      return res.json({ liked: !!like });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch like status'));
     }
   }
 }

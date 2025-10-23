@@ -16,6 +16,12 @@ router.post('/:post_id/like', authMiddleware, PostController.createLike); // OK
 router.get('/:post_id/like', PostController.getAllLikesForPost); // OK
 router.post('/', authMiddleware, PostController.createPost); // OK
 
+router.get(
+  '/:post_id/like/status',
+  authMiddleware,
+  PostController.getLikeStatus
+); // OK
+
 router.delete('/:post_id/like', authMiddleware, PostController.deleteLike); // OK
 router.get('/user/:user_id', PostController.getAllPostsByUser); // OK
 

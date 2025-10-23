@@ -10,19 +10,32 @@ import VerifiedIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 
 import { timeAgo } from '../utils/DateTime';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PROFILE_ROUTE } from '../utils/consts';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { POST_ROUTE } from '../utils/consts';
-import { createLike } from '../http/postApi';
+import {
+  createLike,
+  deleteLike,
+  getAllCommentsForPost,
+  getLikeStatus,
+} from '../http/postApi';
+import { useNotification } from '../context/NotificationContext';
 
 export default function PostModel({ post }) {
-  const [clickedLike, setClickedLike] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
+  const { showNotification } = useNotification();
   const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
+  const currentUserId = useSelector((state) => state.auth.user?.id);
+
+  const [likesCount, setLikesCount] = useState(post?.likes_count || 0);
+  const [likedByCurrentUser, setLikedByCurrentUser] = useState(
+    !!post?.liked_by_current_user
+  );
+  const [commentCount, setCommentCount] = useState(0);
   const hoverTimer = useRef(null);
   const leaveTimer = useRef(null);
 
@@ -55,16 +68,77 @@ export default function PostModel({ post }) {
 
   const handleLikeClick = async (e) => {
     e.stopPropagation();
+    e.preventDefault();
 
-    await createLike(post.id).catch((err) => {
-      console.error('Error liking post:', err);
-    });
-    setClickedLike(!clickedLike);
+    if (!post?.id) return;
+
+    if (!currentUserId) {
+      showNotification('Please log in to like posts');
+      return;
+    }
+
+    try {
+      if (!likedByCurrentUser) {
+        const response = await createLike(post.id);
+        setLikesCount(
+          response?.data?.likes_count || response?.data?.count || likesCount + 1
+        );
+        setLikedByCurrentUser(true);
+      } else {
+        const response = await deleteLike(post.id);
+        setLikesCount(
+          response?.data?.likes_count ||
+            response?.data?.count ||
+            Math.max(0, likesCount - 1)
+        );
+        setLikedByCurrentUser(false);
+      }
+    } catch (err) {
+      console.error('Error toggling like:', err);
+      showNotification(err?.response?.data?.message || 'Error toggling like');
+    }
   };
 
   const handlePostClick = () => {
     window.location.href = `${POST_ROUTE}/${post.id}`;
   };
+
+  useEffect(() => {
+    if (!post?.id) return;
+
+    const fetchCommentCount = async () => {
+      try {
+        const response = await getAllCommentsForPost(post.id);
+        const count = Array.isArray(response?.data)
+          ? response.data.length
+          : response?.data?.count || 0;
+        setCommentCount(count);
+      } catch (error) {
+        showNotification(
+          error?.response?.data?.message || 'Error fetching comment count'
+        );
+      }
+    };
+
+    fetchCommentCount();
+  }, [post?.id]);
+
+  useEffect(() => {
+    if (!post?.id) return;
+
+    const fetchLikeStatus = async () => {
+      try {
+        const response = await getLikeStatus(post.id);
+        setLikedByCurrentUser(!!response?.data?.liked);
+      } catch (error) {
+        showNotification(
+          error?.response?.data?.message || 'Error fetching like status'
+        );
+      }
+    };
+
+    fetchLikeStatus();
+  }, [post?.id]);
 
   return (
     <div className=' mt-5 cursor-pointer' onClick={handlePostClick}>
@@ -83,6 +157,7 @@ export default function PostModel({ post }) {
             <NavLink
               to={`${PROFILE_ROUTE}/${post?.authorId}`}
               className='text-white font-medium pl-3 hover:underline'
+              onClick={(e) => e.stopPropagation()}
             >
               {post?.authorName}
             </NavLink>
@@ -170,23 +245,23 @@ export default function PostModel({ post }) {
 
         <div className='flex -ml-3.5 mt-1'>
           <button
-            className={`text-[var(--color-text)] items-center flex gap-2 px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer ${
-              clickedLike ? 'text-red-600' : ''
+            className={`text-[var(--color-text)] items-center flex gap-2 px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer active:scale-95 transition-transform duration-150 ${
+              likedByCurrentUser ? 'text-red-600' : ''
             }`}
             onClick={handleLikeClick}
           >
             <LikeIcon
               className={`w-5.5 h-5.5 inline-block ${
-                clickedLike ? 'fill-red-600' : ''
+                likedByCurrentUser ? 'fill-red-600' : ''
               }`}
             />
-            <span>{clickedLike ? 1 : 0}</span>
+            <span>{likesCount}</span>
           </button>
-          <button className='text-[var(--color-text)] items-center flex gap-1 cursor-pointer px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl'>
+          <button className='text-[var(--color-text)] items-center flex gap-1 cursor-pointer px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl active:scale-95 transition-transform duration-150'>
             <MessageIcon className='w-5.5 h-5.5 inline-block' />
-            <span>0</span>
+            <span>{commentCount}</span>
           </button>
-          <button className='px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer'>
+          <button className='px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer active:scale-95 transition-transform duration-150'>
             <RepostIcon className='w-5.5 h-5.5 inline-block rotate-90' />
           </button>
         </div>
