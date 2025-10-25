@@ -1,29 +1,46 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-import Logo from '../assets/Profile/Logo.jpg';
 import ChevronRight from '../assets/Icon/chevron-right.svg?react';
 import PlusIcon from '../assets/Icon/plus-icon.svg?react';
 import ImageIcon from '../assets/Icon/image-icon.svg?react';
+import LocationIcon from '../assets/Icon/location-icon.svg?react';
+import EmojiIcon from '../assets/Icon/emoji-smile-icon.svg?react';
 
 import { createPost } from '../http/postApi';
 import { useSelector } from 'react-redux';
 import { getUser } from '../http/userApi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNotification } from '../context/NotificationContext';
 
 import CustomSelect from './CustomSelect';
 import CustomInput from './CustomInput';
+import Picker from 'emoji-picker-react';
 
 export default function CreatePostModel({ isOpen, onClose }) {
   const [image, setImage] = useState([]);
   const [categories, setCategories] = useState([]);
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
+  const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [openLocationPicker, setOpenLocationPicker] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   const { showNotification } = useNotification();
   const userId = useSelector((state) => state.auth.user?.id);
+
+  const pickerRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setShowPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,6 +82,7 @@ export default function CreatePostModel({ isOpen, onClose }) {
     onClose();
     setText('');
     setTitle('');
+    setLocation('');
     setImage([]);
     setCategories([]);
   };
@@ -75,13 +93,20 @@ export default function CreatePostModel({ isOpen, onClose }) {
 
     try {
       const categoryIds = categories.map((cat) => cat.id);
-      const response = await createPost(title, text, image, categoryIds);
+      const response = await createPost(
+        title,
+        text,
+        location,
+        image,
+        categoryIds
+      );
 
       if (response.status === 200) {
         showNotification(response.data.message);
         onClose();
         setText('');
         setTitle('');
+        setLocation('');
         setImage([]);
         setCategories([]);
       }
@@ -90,6 +115,10 @@ export default function CreatePostModel({ isOpen, onClose }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onEmojiClick = (emojiData, event) => {
+    setText((prev) => prev + emojiData.emoji);
   };
 
   return (
@@ -188,18 +217,59 @@ export default function CreatePostModel({ isOpen, onClose }) {
           </div>
         )}
 
-        <div className={`ml-13 ${image.length > 0 ? 'mt-2' : 'mt-0.5'}`}>
-          <input
-            id='fileUpload'
-            type='file'
-            multiple
-            accept='image/*'
-            onChange={handleImageChange}
-            className='hidden'
+        <div
+          className={`ml-13 flex gap-1 items-center ${
+            image.length > 0 ? 'mt-2' : 'mt-0.5'
+          }`}
+        >
+          <div>
+            <input
+              id='fileUpload'
+              type='file'
+              multiple
+              accept='image/*'
+              onChange={handleImageChange}
+              className='hidden'
+            />
+            <label htmlFor='fileUpload' className='cursor-pointer'>
+              <ImageIcon className='w-5.5 h-5.5' />
+            </label>
+          </div>
+          <LocationIcon
+            className='w-5.5 h-5.5 cursor-pointer'
+            onClick={() => setOpenLocationPicker(true)}
           />
-          <label htmlFor='fileUpload' className='cursor-pointer'>
-            <ImageIcon className='w-5.5 h-5.5' />
-          </label>
+          <button onClick={() => setShowPicker((prev) => !prev)}>
+            <EmojiIcon className='w-5.5 h-5.5 cursor-pointer' />
+          </button>
+          {showPicker && (
+            <div
+              ref={pickerRef}
+              className={`absolute top-10 right-30 mt-2 z-50 transition-transform duration-150 ${
+                showPicker ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
+              }`}
+            >
+              <Picker
+                onEmojiClick={onEmojiClick}
+                lazyLoadEmojis
+                disableSearchBar
+                disableSkinTonePicker
+                theme='dark'
+              />
+            </div>
+          )}
+
+          {openLocationPicker && (
+            <input
+              type='text'
+              className='outline-none placeholder:text-[var(--color-text)] text-white w-full bg-transparent border-b border-[var(--color-border)]'
+              placeholder='Введіть місцезнаходження'
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              onBlur={() => setOpenLocationPicker(false)}
+              autoFocus
+            />
+          )}
         </div>
 
         <div className='flex justify-between mt-8 items-center'>

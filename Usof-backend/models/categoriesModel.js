@@ -17,6 +17,9 @@ class Categories extends BaseModel {
   async findByCategoryPaginated(categoryId, limit, offset) {
     const [rows] = await db.query(
       `SELECT p.*, 
+            (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+             FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+            ) AS images,
             COALESCE(JSON_ARRAYAGG(c.title), JSON_ARRAY()) AS categories
      FROM posts p
      JOIN post_categories pc ON p.id = pc.postId

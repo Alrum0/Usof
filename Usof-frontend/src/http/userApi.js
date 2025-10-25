@@ -93,3 +93,25 @@ export const uploadAvatar = async (avatarFile) => {
     throw err;
   }
 };
+
+export const giveStarToUser = async (stars) => {
+  try {
+    const response = await $authHost.post(`/api/users/stars`, {
+      stars,
+    });
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getUserStars = async (userId) => {
+  try {
+    const response = await $authHost.get(`/api/users/${userId}/stars`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

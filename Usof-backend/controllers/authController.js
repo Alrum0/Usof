@@ -123,8 +123,8 @@ class AuthControllers {
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -136,7 +136,8 @@ class AuthControllers {
 
   async refresh(req, res, next) {
     try {
-      const { refreshToken } = req.cookies;
+      // Accept refresh token either from cookie or from request body (for dev / XHR scenarios)
+      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
       if (!refreshToken) {
         return next(ApiError.badRequest('Refresh token not provided'));
       }
@@ -173,14 +174,18 @@ class AuthControllers {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
 
+      // Set cookie when possible; also return refreshToken in body so frontend can store it in dev
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      return res.json({ accessToken: newAccessToken });
+      return res.json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
     } catch (err) {
       console.error(err);
       return next(ApiError.internal('Something went wrong'));

@@ -20,9 +20,14 @@ export default function CustomSelect({
     const fetchCategories = async () => {
       try {
         const response = await getAllCategories();
-        setCategories(
-          response.data.map((cat) => ({ id: cat.id, label: cat.title }))
-        );
+        // `getAllCategories` may return either the axios response or response.data (array)
+        const data = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+        setCategories(data.map((cat) => ({ id: cat.id, label: cat.title })));
       } catch (err) {
         showNotification(err.response?.data?.message || err.message);
       }

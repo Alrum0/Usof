@@ -22,11 +22,8 @@ export default function SortSourceSelector({
 
   const handleSelectSort = (value) => {
     setSort(value);
-  };
-
-  const handleApply = () => {
-    if (onSelect) onSelect(sort);
-    if (onClose) onClose();
+    if (onSelect) onSelect(value); // одразу застосовуємо
+    if (onClose) onClose(); // закриваємо модалку
   };
 
   return (
@@ -42,11 +39,11 @@ export default function SortSourceSelector({
           <div className='text-xs text-[var(--color-text)] font-medium mb-2'>
             Сортування
           </div>
-          <ul className='flex flex-col gap-1 mb-3'>
+          <ul className='flex flex-col gap-1'>
             {sorts.map((s) => (
               <li
                 key={s.value}
-                className={`px-3 py-2 rounded-lg cursor-pointer text-white hover:bg-[#2f2f2f] ${
+                className={`px-3 py-2 rounded-lg cursor-pointer text-white hover:bg-[#2f2f2f] transition-all ${
                   sort === s.value
                     ? 'bg-[#2b2b2b] ring-1 ring-[var(--color-border)]'
                     : ''
@@ -57,21 +54,6 @@ export default function SortSourceSelector({
               </li>
             ))}
           </ul>
-
-          <div className='flex justify-end gap-2'>
-            <button
-              onClick={onClose}
-              className='px-3 py-1 rounded-md text-[var(--color-text)] hover:bg-[#2f2f2f]'
-            >
-              Відмінити
-            </button>
-            <button
-              onClick={handleApply}
-              className='px-3 py-1 rounded-md bg-[var(--color-accent)] text-black font-medium'
-            >
-              Застосувати
-            </button>
-          </div>
         </motion.div>
       )}
     </AnimatePresence>

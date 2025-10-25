@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { getAllPosts, getFollowingPosts } from '../http/postApi';
 import { useNotification } from '../context/NotificationContext';
 import { useSelector } from 'react-redux';
+import { getAllCategories, getPostsForCategory } from '../http/categoriesApi';
 
 import NewPostInput from '../components/NewPostInput';
 import PostModel from '../components/PostModel';
 import ContentSourceSelector from '../components/ContentSourceSelector';
 import SortSourceSelector from '../components/SortSourceSelector';
+import CategoriesModel from '../components/CategoriesModel';
 
 export default function MainPage() {
   const [posts, setPosts] = useState([]);
@@ -19,36 +21,63 @@ export default function MainPage() {
   const [sortModal, setSortModal] = useState(false);
   const [activeSource, setActiveSource] = useState('Для вас');
   const [activeSort, setActiveSort] = useState('date_desc');
+  const [openCategoriesModal, setOpenCategoriesModal] = useState(false);
+  const [categoriesList, setCategoryList] = useState([]);
 
   const { showNotification } = useNotification();
   const isAuth = useSelector((state) => state.auth.isAuth);
 
-  const fetchPosts = async (source, sort = activeSort) => {
+  const fetchPosts = async (source, sort = activeSort, categoryId = null) => {
     setLoading(true);
     try {
-      const response =
-        source === 'Відстежуються'
-          ? await getFollowingPosts()
-          : await getAllPosts();
+      let response;
 
-      let sortedPosts = Array.isArray(response) ? [...response] : [];
-
-      if (sort === 'date_desc') {
-        sortedPosts.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-      } else if (sort === 'date_asc') {
-        sortedPosts.sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-        );
-      } else if (sort === 'likes_desc') {
-        sortedPosts.sort((a, b) => b.likes - a.likes);
-      } else if (sort === 'likes_asc') {
-        sortedPosts.sort((a, b) => a.likes - b.likes);
+      // 🔹 Якщо вказано категорію — беремо пости цієї категорії
+      if (categoryId) {
+        const categoryData = await getPostsForCategory(categoryId);
+        // categoryData shape: { page, limit, count, posts }
+        response = Array.isArray(categoryData?.posts) ? categoryData.posts : [];
+      }
+      // 🔹 Якщо користувач дивиться “Відстежуються”
+      else if (source === 'Відстежуються') {
+        response = await getFollowingPosts();
+      }
+      // 🔹 Інакше просто всі пости
+      else {
+        response = await getAllPosts();
       }
 
+      const postsArray = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+        ? response.data
+        : [];
+
+      let sortedPosts = [...postsArray];
+
+      // 🔸 Сортування
+      const getDate = (p) =>
+        new Date(p?.publishDate ?? p?.createdAt ?? 0).getTime();
+      const getLikes = (p) => Number(p?.likes_count ?? p?.likes ?? 0);
+
+      if (sort === 'date_desc')
+        sortedPosts.sort((a, b) => getDate(b) - getDate(a));
+      else if (sort === 'date_asc')
+        sortedPosts.sort((a, b) => getDate(a) - getDate(b));
+      else if (sort === 'likes_desc')
+        sortedPosts.sort((a, b) => getLikes(b) - getLikes(a));
+      else if (sort === 'likes_asc')
+        sortedPosts.sort((a, b) => getLikes(a) - getLikes(b));
+
       setPosts(sortedPosts);
-      setActiveSource(source);
+
+      // 🔸 Якщо є категорія — оновлюємо activeSource її назвою
+      if (categoryId) {
+        const category = categoriesList.find((c) => c.id === categoryId);
+        setActiveSource(category?.title || 'Категорія');
+      } else {
+        setActiveSource(source);
+      }
     } catch (error) {
       showNotification(error.response?.data?.message || error.message);
     } finally {
@@ -59,6 +88,24 @@ export default function MainPage() {
   useEffect(() => {
     fetchPosts('Для вас');
   }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getAllCategories();
+        setCategoryList(Array.isArray(data) ? data : []);
+      } catch (err) {
+        showNotification(
+          err.response?.data?.message || 'Не вдалося завантажити категорії.'
+        );
+        setCategoryList([]);
+      }
+    };
+
+    if (openCategoriesModal) {
+      fetchCategories();
+    }
+  }, [openCategoriesModal]);
 
   if (loading) {
     return (
@@ -122,9 +169,21 @@ export default function MainPage() {
           ))}
         </div>
       </section>
-      <button className='absolute right-6 top-6 cursor-pointer active:scale-95 transition-transform duration-150'>
+      <button
+        className='absolute right-6 top-6 cursor-pointer active:scale-95 transition-transform duration-150'
+        onClick={() => setOpenCategoriesModal(true)}
+      >
         <img src={MenuIcon} alt='Menu Icon' className='w-6 h-6 invert' />
       </button>
+      <CategoriesModel
+        isOpen={openCategoriesModal}
+        onClose={() => setOpenCategoriesModal(false)}
+        categories={categoriesList}
+        onSelectCategory={(cat) => {
+          setOpenCategoriesModal(false);
+          fetchPosts('Для вас', activeSort, cat.id); // 🔹 завантажуємо пости категорії
+        }}
+      />
     </>
   );
 }

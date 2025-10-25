@@ -31,12 +31,15 @@ class Posts extends BaseModel {
         p.id,
         p.title,
         p.content,
+        p.location,
         p.publishDate,
         u.id AS authorId,
         u.login AS authorName,
         u.fullName AS authorFullName,
         u.avatar AS authorAvatar,
-        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+  (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+   FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+  ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars
       FROM posts p
@@ -58,7 +61,9 @@ class Posts extends BaseModel {
     const [rows] = await db.query(
       `SELECT 
         p.*,
-        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+  (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+    FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+  ) AS images,
         COALESCE(SUM(ps.stars), 0) AS stars
      FROM posts p
      LEFT JOIN post_image pi ON p.id = pi.postId
@@ -79,12 +84,15 @@ class Posts extends BaseModel {
       p.id,
       p.title,
       p.content,
+      p.location,
       p.publishDate,
       u.id AS authorId,
       u.login AS authorName,
       u.fullName AS authorFullName,
       u.avatar AS authorAvatar,
-      COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+  (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+    FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+  ) AS images,
       COUNT(DISTINCT l.id) AS likes_count,
       COALESCE(SUM(ps.stars), 0) AS stars
     FROM posts p
@@ -131,7 +139,9 @@ class Posts extends BaseModel {
       u.login AS authorName,
       u.fullName AS authorFullName,
       u.avatar AS authorAvatar,
-      COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+  (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+    FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+  ) AS images,
       COUNT(DISTINCT l.id) AS likes_count,
       COALESCE(SUM(ps.stars), 0) AS stars
     FROM posts p
@@ -193,7 +203,9 @@ class Posts extends BaseModel {
         u.login AS authorName,
         u.fullName AS authorFullName,
         u.avatar AS authorAvatar,
-        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+   (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+     FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+   ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars
        FROM posts p
@@ -213,8 +225,10 @@ class Posts extends BaseModel {
   async findPostWithImagesAndStars(postId) {
     const [rows] = await db.query(
       `SELECT 
-        p.*,
-        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+  p.*,
+  (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+    FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+  ) AS images,
         COALESCE(SUM(ps.stars), 0) AS stars
      FROM posts p
      LEFT JOIN post_image pi ON p.id = pi.postId
@@ -237,7 +251,9 @@ class Posts extends BaseModel {
         p.publishDate,
         u.login AS authorName,
         u.avatar AS authorAvatar,
-        COALESCE(JSON_ARRAYAGG(pi.fileName), JSON_ARRAY()) AS images,
+  (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
+    FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
+  ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars
       FROM posts p

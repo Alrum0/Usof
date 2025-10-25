@@ -1,10 +1,17 @@
 import { $authHost } from '.';
 
-export const createPost = async (title, content, images, categories) => {
+export const createPost = async (
+  title,
+  content,
+  location,
+  images,
+  categories
+) => {
   try {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('content', content);
+    formData.append('location', location);
     images.forEach((image) => {
       formData.append('image', image.file);
     });
@@ -24,9 +31,9 @@ export const createPost = async (title, content, images, categories) => {
   }
 };
 
-export const getAllPosts = async ({ sort = 'date_desc', page = 1, limit = 10 } = {}) => {
+export const getAllPosts = async () => {
   try {
-    const response = await $authHost.get(`/api/posts?sort=${sort}&page=${page}&limit=${limit}`);
+    const response = await $authHost.get('/api/posts');
     return response.data.data;
   } catch (err) {
     console.error(err);
@@ -100,10 +107,32 @@ export const getLikeStatus = async (postId) => {
   }
 };
 
-export const getFollowingPosts = async ({ sort = 'date_desc', page = 1, limit = 10 } = {}) => {
+export const getStarStatus = async (postId) => {
   try {
-    const response = await $authHost.get(`/api/posts/following?sort=${sort}&page=${page}&limit=${limit}`);
+    const response = await $authHost.get(`/api/stars/${postId}/star/status`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getFollowingPosts = async () => {
+  try {
+    const response = await $authHost.get('/api/posts/following');
     return response.data.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const giveStarToPost = async (postId, stars) => {
+  try {
+    const response = await $authHost.post(`/api/stars/${postId}/star`, {
+      stars,
+    });
+    return response;
   } catch (err) {
     console.error(err);
     throw err;

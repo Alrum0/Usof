@@ -32,10 +32,8 @@ $authHost.interceptors.response.use(
 
     if (!originalConfig) return Promise.reject(err);
 
-    // already retried
     if (originalConfig._retry) return Promise.reject(err);
 
-    // Don't try to refresh if refresh endpoint itself failed
     if (
       originalConfig.url &&
       originalConfig.url.includes('/api/auth/refresh')
@@ -74,12 +72,20 @@ $authHost.interceptors.response.use(
 
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await $authHost.post('/api/auth/refresh');
+        // include refreshToken from localStorage as fallback (dev without cookies)
+        const storedRefresh = localStorage.getItem('refreshToken');
+        const { data } = await $authHost.post('/api/auth/refresh', {
+          refreshToken: storedRefresh,
+        });
         const newToken = data?.accessToken;
 
         if (!newToken) throw new Error('No access token returned from refresh');
 
         localStorage.setItem('accessToken', newToken);
+        // if server returned a refreshToken (dev path), store it too
+        if (data?.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
         $authHost.defaults.headers.common.authorization = `Bearer ${newToken}`;
 
         originalConfig.headers = originalConfig.headers || {};
@@ -103,9 +109,7 @@ $authHost.interceptors.response.use(
               },
             });
           });
-        } catch (e) {
-          // ignore decode errors
-        }
+        } catch (e) {}
 
         processQueue(null, newToken);
         resolve($authHost(originalConfig));

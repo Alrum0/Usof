@@ -50,10 +50,6 @@ export default function PostPage() {
 
     fetchComments();
   }, [id]);
-
-  //   alert(`Comments length: ${comments.length}`);
-  //   alert(`Post ID: ${id}`);
-
   return (
     <section className='flex justify-center items-center flex-col'>
       <div className='mt-10'>

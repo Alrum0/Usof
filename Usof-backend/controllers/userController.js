@@ -286,10 +286,10 @@ class UserControllers {
 
       await User.updateStarsBalance(userId, stars);
 
-      return res.json({ message: 'Stars added successfully' });
+      return res.json({ message: 'Зірки успішно додано на ваш рахунок' });
     } catch (err) {
       console.error(err);
-      return next(ApiError.internal('Failed to add stars to your account'));
+      return next(ApiError.internal('Не вдалося додати зірки на ваш рахунок'));
     }
   }
 

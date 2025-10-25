@@ -17,10 +17,6 @@ class PostControllers {
     try {
       let { limit, page, sort = 'date_desc' } = req.query;
 
-      // prevent caching so sorting changes are always fetched fresh
-      res.setHeader('Cache-Control', 'no-store');
-      console.debug(`getAllPosts called with sort=${sort}, page=${page}, limit=${limit}`);
-
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;
       let offset = page * limit - limit;
@@ -142,7 +138,7 @@ class PostControllers {
   }
   async createPost(req, res, next) {
     try {
-      const { title, content } = req.body;
+      const { title, content, location } = req.body;
       const authorId = req.user.id;
 
       let categories = Array.isArray(req.body.categories)
@@ -164,6 +160,7 @@ class PostControllers {
       const post = await Post.create({
         title,
         content,
+        location,
         authorId,
       });
 
@@ -368,10 +365,6 @@ class PostControllers {
     try {
       const userId = req.user.id;
       let { limit, page, sort = 'date_desc' } = req.query;
-
-      // prevent caching so sorting changes are always fetched fresh
-      res.setHeader('Cache-Control', 'no-store');
-      console.debug(`findFollowingPosts called with userId=${userId}, sort=${sort}, page=${page}, limit=${limit}`);
 
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;

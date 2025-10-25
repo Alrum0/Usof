@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS posts
     authorId INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     publishDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    location VARCHAR(255),
     status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
     content TEXT NOT NULL,
 

@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.9.0",
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
+    "emoji-picker-react": "^4.14.2",
     "framer-motion": "^12.23.22",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",

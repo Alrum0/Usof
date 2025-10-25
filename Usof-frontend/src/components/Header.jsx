@@ -7,9 +7,11 @@ import LikeIcon from '../assets/Icon/like-icon.svg?react';
 import ProfileIcon from '../assets/Icon/profile-icon.svg?react';
 import MoreVertical from '../assets/Icon/more-vertical-icon.svg?react';
 import AdminIcon from '../assets/Icon/star-admin-icon.svg?react';
+import Star from '../assets/Icon/stars2.png';
 
 import AuthRequiredModel from '../components/AuthRequiredModel';
 import CreatePostModel from './CreatePostModel';
+import StarsModal from './StarsModal';
 
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
@@ -28,6 +30,7 @@ export default function Header() {
   const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isExitModelOpen, setIsExitModelOpen] = useState(false);
+  const [isStarsModelOpen, setIsStarsModelOpen] = useState(false);
 
   const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isAuth = useSelector((state) => state.auth.isAuth);
@@ -41,6 +44,11 @@ export default function Header() {
     } else {
       setIsOpen(true);
     }
+  };
+
+  const handleStarsAction = () => {
+    setIsStarsModelOpen(true);
+    setIsExitModelOpen(false);
   };
 
   return (
@@ -164,15 +172,24 @@ export default function Header() {
           <MoreVertical className='w-7 h-7 text-[#4d4d4d] group-hover:text-white transition-all duration-200' />
         </button>
         {isExitModelOpen && (
-          <div className='absolute bottom-12 left-20 mt-12 w-48 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-lg shadow-lg hover:bg-[var(--color-background-secondary)]'>
+          <div className='absolute bottom-12 left-20 mt-12 w-48 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-lg shadow-lg px-2'>
             <ul className='py-2'>
-              <li>
+              <li className='hover:bg-[var(--color-background-secondary)] rounded-lg'>
+                <button
+                  className='flex justify-center items-center w-full px-4 py-2 text-sm text-white gap-2'
+                  onClick={handleStarsAction}
+                >
+                  <img src={Star} alt='Star' className='w-6 h-6' />
+                  <span className='ml-2'>Мої зірки</span>
+                </button>
+              </li>
+              <li className='hover:bg-[var(--color-background-secondary)] rounded-lg'>
                 <button
                   onClick={() => {
                     dispatch(logout());
                     setIsExitModelOpen(false);
                   }}
-                  className='block w-full px-4 py-2 text-sm text-red-600  text-center'
+                  className='block w-full px-4 py-2 text-sm text-red-600 text-center'
                 >
                   Logout
                 </button>
@@ -184,6 +201,10 @@ export default function Header() {
         <AuthRequiredModel
           isOpen={isAuthModelOpen}
           onClose={() => setIsAuthModelOpen(false)}
+        />
+        <StarsModal
+          isOpen={isStarsModelOpen}
+          onClose={() => setIsStarsModelOpen(false)}
         />
       </header>
     </>
