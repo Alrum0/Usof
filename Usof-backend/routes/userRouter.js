@@ -23,5 +23,6 @@ router.get('/:user_id/followers', userController.getFollowers); // OK
 router.get('/:user_id/following', userController.getFollowing); // OK
 // ---- ------ ------ ----
 router.get('/:user_id/rating', userController.getUserRating); // OK
+router.get('/:user_id/comments', userController.getUserComments); // OK
 
 module.exports = router;

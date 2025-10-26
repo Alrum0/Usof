@@ -29,7 +29,8 @@ class Repost extends BaseModel {
         ) AS images,
         (SELECT COUNT(*) FROM likes WHERE postId = p.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars,
-        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+        (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
       FROM reposts r
       JOIN posts p ON r.postId = p.id
       JOIN users u ON p.authorId = u.id

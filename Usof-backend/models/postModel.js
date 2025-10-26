@@ -263,8 +263,11 @@ class Posts extends BaseModel {
         p.title,
         p.content,
         p.publishDate,
+        u.id AS authorId,
         u.login AS authorLogin,
         u.avatar AS authorAvatar,
+        u.role AS authorRole,
+        u.isOfficial AS authorIsOfficial,
   (SELECT COALESCE(JSON_ARRAYAGG(t.fileName), JSON_ARRAY())
     FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
   ) AS images,

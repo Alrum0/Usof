@@ -50,7 +50,6 @@ class UserControllers {
           const { password, ...rest } = u;
           return rest;
         });
-        console.log('getAllUsers - admin data sample:', adminData[0]); // DEBUG
         return res.json(adminData);
       }
 
@@ -157,7 +156,11 @@ class UserControllers {
       }
 
       await User.update(userId, { avatar: fileName });
-      // return res.json({ message: 'Avatar uploaded successfully' });
+
+      return res.json({
+        message: 'Avatar uploaded successfully',
+        avatar: fileName,
+      });
     } catch (err) {
       console.error(err);
       next(ApiError.internal('Error uploading avatar'));
@@ -421,6 +424,24 @@ class UserControllers {
     } catch (err) {
       console.error(err);
       return next(ApiError.internal('Error fetching user rating'));
+    }
+  }
+
+  async getUserComments(req, res, next) {
+    try {
+      const { user_id } = req.params;
+      const Comment = require('../models/commentModel');
+
+      const user = await User.findById(user_id);
+      if (!user) {
+        return next(ApiError.badRequest('User not found'));
+      }
+
+      const comments = await Comment.findAllByUserId(user_id);
+      return res.json(comments);
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Error fetching user comments'));
     }
   }
 }

@@ -14,12 +14,14 @@ import {
   getFollowing,
   unfollowUser,
   getFollowers,
+  getUserComments,
 } from '../http/userApi';
 
 import NewPostInput from '../components/NewPostInput';
 import PostModel from '../components/PostModel';
 import UnfollowModel from '../components/UnfollowModel';
 import EditModel from '../components/EditModel';
+import UserCommentCard from '../components/UserCommentCard';
 
 export default function ProfilePage() {
   const { showNotification } = useNotification();
@@ -27,6 +29,7 @@ export default function ProfilePage() {
 
   const [posts, setPosts] = useState([]);
   const [reposts, setReposts] = useState([]);
+  const [comments, setComments] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -36,8 +39,6 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('chains');
 
   const userId = useSelector((state) => state.auth.user?.id);
-  // const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
-  // const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isSelf = userId === Number(id);
   const isAdmin = userData?.role === 'ADMIN';
   const isOfficial = userData?.isOfficial;
@@ -66,6 +67,18 @@ export default function ProfilePage() {
     }
   };
 
+  const handleProfileUpdate = async () => {
+    try {
+      const response = await getUser(id);
+      setUserData(response.data);
+    } catch (err) {
+      console.error(err);
+      showNotification(
+        err?.response?.data?.message || 'Error refreshing profile data'
+      );
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -74,7 +87,6 @@ export default function ProfilePage() {
         const response = await getUser(id);
         setUserData(response.data);
 
-        // Only fetch following status if user is authenticated
         if (userId) {
           const followingResponse = await getFollowing(userId);
           setFollowing(followingResponse.data.some((u) => u.id === Number(id)));
@@ -119,8 +131,20 @@ export default function ProfilePage() {
       }
     };
 
+    const fetchComments = async () => {
+      try {
+        const response = await getUserComments(id);
+        setComments(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        showNotification(
+          err?.response?.data?.message || 'Error fetching comments'
+        );
+      }
+    };
+
     fetchPosts();
     fetchReposts();
+    fetchComments();
   }, [userId, id]);
 
   useEffect(() => {
@@ -219,7 +243,11 @@ export default function ProfilePage() {
                   : 'text-black bg-white'
               }`}
             >
-              {isSelf ? 'Edit Profile' : following ? 'Відстежується' : 'Follow'}
+              {isSelf
+                ? 'Редагувати'
+                : following
+                ? 'Відстежується'
+                : 'Слідкувати'}
             </button>
           </div>
           <div className='mt-6 -mx-8 grid grid-cols-4 place-items-center text-[var(--color-text)] text-xl font-normal '>
@@ -276,6 +304,10 @@ export default function ProfilePage() {
           <div>
             {activeTab === 'chains' &&
               posts.map((post) => <PostModel key={post.id} post={post} />)}
+            {activeTab === 'replies' &&
+              comments.map((comment) => (
+                <UserCommentCard key={comment.id} comment={comment} />
+              ))}
             {activeTab === 'reposts' &&
               reposts.map((post) => <PostModel key={post.id} post={post} />)}
           </div>
@@ -290,6 +322,7 @@ export default function ProfilePage() {
       <EditModel
         isOpen={isSelf && isOpenEdit}
         onClose={() => setIsOpenEdit(false)}
+        onUpdate={handleProfileUpdate}
       />
     </>
   );

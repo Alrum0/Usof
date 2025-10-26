@@ -8,19 +8,27 @@ import { useSelector } from 'react-redux';
 
 import { updateUser, uploadAvatar } from '../http/userApi';
 
-export default function EditModel({ isOpen, onClose }) {
-  if (!isOpen) return null;
-
+export default function EditModel({ isOpen, onClose, onUpdate }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [avatarFile, setAvatarFile] = useState(null);
-  const [updateData, setUpdateData] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   const { showNotification } = useNotification();
   const userId = useSelector((state) => state.auth.user?.id);
 
   useEffect(() => {
+    if (!isOpen) {
+      // Reset state when modal closes
+      setAvatarFile(null);
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+      setAvatarPreview(null);
+      return;
+    }
+
     const fetchUser = async () => {
       // Don't fetch if user is not authenticated
       if (!userId) return;
@@ -40,7 +48,9 @@ export default function EditModel({ isOpen, onClose }) {
       }
     };
     fetchUser();
-  }, [userId, onClose]);
+  }, [isOpen, userId, onClose]);
+
+  if (!isOpen) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,11 +59,10 @@ export default function EditModel({ isOpen, onClose }) {
 
   const handleAvatarChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setAvatarFile(e.target.files[0]);
-      setUserData((prev) => ({
-        ...prev,
-        avatar: URL.createObjectURL(e.target.files[0]),
-      }));
+      const file = e.target.files[0];
+      setAvatarFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
     }
   };
 
@@ -62,7 +71,9 @@ export default function EditModel({ isOpen, onClose }) {
     setLoading(true);
 
     try {
-      let updateMessage = '';
+      if (avatarFile) {
+        await uploadAvatar(avatarFile);
+      }
 
       const userUpdatePayload = {
         fullName: userData?.fullName,
@@ -74,16 +85,15 @@ export default function EditModel({ isOpen, onClose }) {
         userData?.fullName || userData?.biography || userData?.email;
 
       if (hasUserChanges) {
-        const response = await updateUser(userId, userUpdatePayload);
-        updateMessage += response.data.message;
+        await updateUser(userId, userUpdatePayload);
       }
 
-      if (avatarFile) {
-        const avatarResponse = await uploadAvatar(avatarFile);
-        updateMessage += ' ' + avatarResponse.data.message;
+      showNotification('Дані профілю успішно оновлено!');
+
+      if (typeof onUpdate === 'function') {
+        await onUpdate();
       }
 
-      showNotification(updateMessage || 'Дані профілю успішно оновлено!');
       onClose();
     } catch (err) {
       console.error('Update error:', err);
@@ -145,7 +155,11 @@ export default function EditModel({ isOpen, onClose }) {
                   className='cursor-pointer h-18 w-18'
                 >
                   <img
-                    src={`${BASE_URL}/${userData?.avatar}`}
+                    src={
+                      avatarPreview
+                        ? avatarPreview
+                        : `${BASE_URL}/${userData?.avatar}`
+                    }
                     alt='logo profile'
                     className='w-18 h-18 rounded-full object-cover'
                   />

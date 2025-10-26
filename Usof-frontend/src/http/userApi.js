@@ -116,3 +116,13 @@ export const getUserStars = async (userId) => {
     throw err;
   }
 };
+
+export const getUserComments = async (userId) => {
+  try {
+    const response = await $host.get(`/api/users/${userId}/comments`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
