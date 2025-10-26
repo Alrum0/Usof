@@ -179,7 +179,7 @@ export default function PostModel({ post }) {
                 className='text-white font-medium pl-3 hover:underline'
                 onClick={(e) => e.stopPropagation()}
               >
-                {post?.authorName}
+                {post?.authorLogin}
               </NavLink>
 
               {showTooltip && (
