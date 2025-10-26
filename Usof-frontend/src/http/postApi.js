@@ -138,3 +138,106 @@ export const giveStarToPost = async (postId, stars) => {
     throw err;
   }
 };
+
+export const deletePostById = async (postId) => {
+  try {
+    const response = await $authHost.delete(`/api/posts/${postId}`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const updatePost = async (...args) => {
+  try {
+    const postId = args[0];
+    const maybeFormData = args[1];
+
+    if (maybeFormData && typeof maybeFormData.append === 'function') {
+      // Let the browser set Content-Type (with boundary). Do not set multipart/form-data header manually.
+      const response = await $authHost.patch(
+        `/api/posts/${postId}`,
+        maybeFormData
+      );
+      return response;
+    }
+
+    const title = args[1];
+    const content = args[2];
+    const location = args[3];
+    const images = args[4] || [];
+    const categories = args[5] || [];
+    const removedImages = args[6] || [];
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('location', location);
+
+    (images || []).forEach((image) => {
+      if (image?.file) {
+        formData.append('newImages', image.file);
+      }
+    });
+
+    (categories || []).forEach((category) => {
+      formData.append('categories', category);
+    });
+
+    (removedImages || []).forEach((imgId) => {
+      formData.append('removedImages', imgId);
+    });
+
+    // Let axios/browser set the Content-Type header for FormData so the multipart boundary is included
+    const response = await $authHost.put(`/api/posts/${postId}`, formData);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getCategoriesForPost = async (postId) => {
+  try {
+    const response = await $authHost.get(`/api/posts/${postId}/categories`);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const createCommentForPost = async (postId, content) => {
+  try {
+    const response = await $authHost.post(`/api/posts/${postId}/comments`, {
+      content,
+    });
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const updateCommentById = async (commentId, content) => {
+  try {
+    const response = await $authHost.patch(`/api/comments/${commentId}`, {
+      content,
+    });
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const deleteCommentById = async (commentId) => {
+  try {
+    const response = await $authHost.delete(`/api/comments/${commentId}`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

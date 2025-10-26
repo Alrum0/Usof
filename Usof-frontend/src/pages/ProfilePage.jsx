@@ -32,6 +32,7 @@ export default function ProfilePage() {
   const [following, setFollowing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [activeTab, setActiveTab] = useState('chains');
 
   const userId = useSelector((state) => state.auth.user?.id);
   const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
@@ -197,17 +198,49 @@ export default function ProfilePage() {
               {isSelf ? 'Edit Profile' : following ? 'Відстежується' : 'Follow'}
             </button>
           </div>
-          <div className='mt-6 -mx-8 grid grid-cols-4 place-items-center text-[var(--color-text)] text-xl font-normal'>
-            <button className='border-b w-full border-[var(--color-border)] text-center pb-4 focus:border-white focus:text-white'>
+          <div className='mt-6 -mx-8 grid grid-cols-4 place-items-center text-[var(--color-text)] text-xl font-normal '>
+            <button
+              onClick={() => setActiveTab('chains')}
+              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer 
+      ${
+        activeTab === 'chains'
+          ? 'border-white text-white'
+          : 'border-[var(--color-border)] text-[var(--color-text)]'
+      }`}
+            >
               Ланцюжки
             </button>
-            <button className='border-b w-full border-[var(--color-border)] text-center pb-4 focus:border-white focus:text-white'>
+            <button
+              onClick={() => setActiveTab('replies')}
+              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer
+      ${
+        activeTab === 'replies'
+          ? 'border-white text-white'
+          : 'border-[var(--color-border)] text-[var(--color-text)]'
+      }`}
+            >
               Відповіді
             </button>
-            <button className='border-b w-full border-[var(--color-border)] text-center pb-4 focus:border-white focus:text-white'>
+            <button
+              onClick={() => setActiveTab('media')}
+              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer
+      ${
+        activeTab === 'media'
+          ? 'border-white text-white'
+          : 'border-[var(--color-border)] text-[var(--color-text)]'
+      }`}
+            >
               Медіафайли
             </button>
-            <button className='border-b w-full border-[var(--color-border)] text-center pb-4 focus:border-white focus:text-white'>
+            <button
+              onClick={() => setActiveTab('reposts')}
+              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer
+      ${
+        activeTab === 'reposts'
+          ? 'border-white text-white'
+          : 'border-[var(--color-border)] text-[var(--color-text)]'
+      }`}
+            >
               Репости
             </button>
           </div>

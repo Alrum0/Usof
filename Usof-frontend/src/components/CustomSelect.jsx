@@ -7,6 +7,8 @@ import PlusIcon from '../assets/Icon/plus-icon.svg?react';
 export default function CustomSelect({
   placeholder = 'Додайте тему',
   onSelect,
+  defaultValue = [],
+  minSelected = 0,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -20,20 +22,71 @@ export default function CustomSelect({
     const fetchCategories = async () => {
       try {
         const response = await getAllCategories();
-        // `getAllCategories` may return either the axios response or response.data (array)
         const data = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
           ? response.data
           : [];
+        const options = data.map((cat) => ({ id: cat.id, label: cat.title }));
+        setCategories(options);
 
-        setCategories(data.map((cat) => ({ id: cat.id, label: cat.title })));
+        try {
+          if (Array.isArray(defaultValue) && defaultValue.length > 0) {
+            const initial = defaultValue
+              .map((d) => {
+                if (!d) return null;
+                if (typeof d === 'object' && d.id)
+                  return { id: d.id, label: d.label || d.title || '' };
+                if (typeof d === 'string') {
+                  const found = options.find(
+                    (o) => o.label === d || String(o.id) === d
+                  );
+                  return found || { id: `new-${d}`, label: d };
+                }
+                return null;
+              })
+              .filter(Boolean);
+            if (initial.length > 0) {
+              setSelectedOption(initial);
+            }
+          }
+        } catch (err) {}
       } catch (err) {
         showNotification(err.response?.data?.message || err.message);
       }
     };
     fetchCategories();
   }, []);
+
+  // If parent changes defaultValue after categories load, map them to options
+  useEffect(() => {
+    try {
+      if (categories.length === 0) return;
+      if (!Array.isArray(defaultValue) || defaultValue.length === 0) return;
+
+      const initial = defaultValue
+        .map((d) => {
+          if (!d) return null;
+          if (typeof d === 'object' && d.id)
+            return { id: d.id, label: d.label || d.title || '' };
+          if (typeof d === 'string') {
+            const found = categories.find(
+              (o) => o.label === d || String(o.id) === d
+            );
+            return found || { id: `new-${d}`, label: d };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
+      if (initial.length > 0) {
+        setSelectedOption(initial);
+      }
+    } catch (err) {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories, defaultValue]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -53,6 +106,7 @@ export default function CustomSelect({
       !selectedOption.some((sel) => sel.id === category.id)
   );
 
+  // when no input, show a few top categories instead of only the first one
   const displayOptions =
     inputValue === '' ? categories.slice(0, 1) : filteredOptions;
 
@@ -66,6 +120,14 @@ export default function CustomSelect({
   };
 
   const handleRemove = (id) => {
+    if (selectedOption.length <= minSelected) {
+      // don't allow removing below minimum
+      try {
+        showNotification(`Має бути принаймні ${minSelected} категорія(ій)`);
+      } catch (err) {}
+      return;
+    }
+
     const updated = selectedOption.filter((c) => c.id !== id);
     setSelectedOption(updated);
     if (onSelect) {

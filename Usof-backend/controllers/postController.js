@@ -222,6 +222,24 @@ class PostControllers {
       const { post_id } = req.params;
       let { title, content, status } = req.body;
 
+      // DEBUG: log incoming categories and files for troubleshooting
+      try {
+        console.log(
+          'updatePost request - categories type:',
+          typeof req.body.categories
+        );
+        console.log(
+          'updatePost request - categories value:',
+          req.body.categories
+        );
+        console.log(
+          'updatePost request - files keys:',
+          req.files ? Object.keys(req.files) : null
+        );
+      } catch (e) {
+        console.error('Failed to log debug info in updatePost', e);
+      }
+
       const post = await Post.findById(post_id);
       if (!post) {
         return next(ApiError.badRequest('Post not found'));
@@ -246,11 +264,45 @@ class PostControllers {
         await Post.update(post_id, updateData);
       }
 
-      let categories = Array.isArray(req.body.categories)
-        ? req.body.categories
-        : [req.body.categories];
+      // normalize categories: accept arrays, repeated form fields, JSON strings, or comma-separated values
+      let categories = null;
+      if (req.body.categories !== undefined) {
+        const raw = req.body.categories;
 
-      if (categories) {
+        if (Array.isArray(raw)) {
+          categories = raw;
+        } else if (typeof raw === 'string') {
+          // try JSON array (e.g. '[1,2]')
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              categories = parsed;
+            } else {
+              categories = [raw];
+            }
+          } catch (e) {
+            // not JSON, maybe comma-separated like '1,2'
+            if (raw.includes(',')) {
+              categories = raw.split(',');
+            } else {
+              categories = [raw];
+            }
+          }
+        } else {
+          categories = [raw];
+        }
+
+        // normalize values to strings/numbers and filter out empty
+        categories = categories
+          .map((c) => (typeof c === 'string' ? c.trim() : c))
+          .filter((c) => c !== undefined && c !== null && c !== '');
+
+        if (categories.length === 0) {
+          return next(
+            ApiError.badRequest('Post must have at least one category')
+          );
+        }
+
         const validCategories = await Categories.checkCategories(categories);
         if (validCategories.length !== categories.length) {
           return next(
@@ -260,6 +312,40 @@ class PostControllers {
 
         await PostCategories.deleteByPostId(post_id);
         await PostCategories.addCategories(post_id, categories);
+      }
+
+      // handle explicit removal of some existing images
+      let removedImages = Array.isArray(req.body.removedImages)
+        ? req.body.removedImages
+        : req.body.removedImages
+        ? [req.body.removedImages]
+        : [];
+
+      if (removedImages && removedImages.length > 0) {
+        try {
+          const existingImages = await PostImage.findAll({ postId: post_id });
+          const toDelete = existingImages.filter((img) =>
+            removedImages.includes(img.fileName)
+          );
+          await Promise.all(
+            toDelete.map(async (img) => {
+              const filePath = path.resolve(
+                __dirname,
+                '..',
+                'static',
+                img.fileName
+              );
+              try {
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+                await PostImage.delete(img.id);
+              } catch (err) {
+                console.error(`Failed to delete image ${img.fileName}:`, err);
+              }
+            })
+          );
+        } catch (err) {
+          console.error('Failed to process removedImages', err);
+        }
       }
 
       if (req.files && req.files.image) {

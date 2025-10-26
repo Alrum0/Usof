@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
 import { getAllCommentsForPost } from '../http/postApi';
 import CommentPreview from '../components/CommentPreview';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import PostModel from '../components/PostModel';
 
@@ -12,6 +13,8 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true);
   const [loadingComments, setLoadingComments] = useState(true);
   const [comments, setComments] = useState([]);
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const { id } = useParams();
   const { showNotification } = useNotification();
 
@@ -36,7 +39,11 @@ export default function PostPage() {
     const fetchComments = async () => {
       try {
         setLoadingComments(true);
-        const response = await getAllCommentsForPost(id, 'createdAt', 'asc');
+        const response = await getAllCommentsForPost(
+          id,
+          'createdAt',
+          sortOrder
+        );
         setComments(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
         console.error(err);
@@ -49,7 +56,7 @@ export default function PostPage() {
     };
 
     fetchComments();
-  }, [id]);
+  }, [id, sortOrder]);
   return (
     <section className='flex justify-center items-center flex-col'>
       <div className='mt-10'>
@@ -63,8 +70,64 @@ export default function PostPage() {
         )}
         <PostModel post={post} />
 
-        <hr />
-        <div className='mt-4 flex flex-col'>
+        <div className='mt-4 mb-4 flex items-center justify-between'>
+          <h3 className='text-white font-semibold'>Коментарі</h3>
+
+          <div className='relative'>
+            <button
+              onClick={() => setIsSortOpen(!isSortOpen)}
+              className='px-3 py-1.5 bg-[var(--color-input)] text-white text-sm rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent)] focus:outline-none focus:border-[var(--color-accent)] transition-colors cursor-pointer'
+            >
+              {sortOrder === 'asc' ? 'Найстарші першими' : 'Найновіші першими'}
+            </button>
+            <AnimatePresence>
+              {isSortOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.12 }}
+                  className='absolute top-12 right-0 bg-[var(--color-background-secondary)] border border-[var(--color-border)] rounded-xl shadow-lg w-56 z-50 p-3'
+                >
+                  <div className='text-xs text-[var(--color-text)] font-medium mb-2'>
+                    Сортування коментарів
+                  </div>
+                  <ul className='flex flex-col gap-1'>
+                    <li
+                      className={`px-3 py-2 rounded-lg cursor-pointer text-white hover:bg-[#2f2f2f] transition-all ${
+                        sortOrder === 'asc'
+                          ? 'bg-[#2b2b2b] ring-1 ring-[var(--color-border)]'
+                          : ''
+                      }`}
+                      onClick={() => {
+                        setSortOrder('asc');
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      Найстарші першими
+                    </li>
+                    <li
+                      className={`px-3 py-2 rounded-lg cursor-pointer text-white hover:bg-[#2f2f2f] transition-all ${
+                        sortOrder === 'desc'
+                          ? 'bg-[#2b2b2b] ring-1 ring-[var(--color-border)]'
+                          : ''
+                      }`}
+                      onClick={() => {
+                        setSortOrder('desc');
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      Найновіші першими
+                    </li>
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <hr className='border-[var(--color-border)] -mx-8 mt-2 mb-4' />
+        <div className='flex flex-col'>
           {loadingComments && (
             <div className='text-[var(--color-text)] mt-4 text-sm italic'>
               Завантаження коментарів...

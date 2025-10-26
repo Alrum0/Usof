@@ -13,6 +13,6 @@ export const registration = async (
     email,
     password,
     confirmPassword,
-    role: 'ADMIN',
+    // role: 'ADMIN',
   });
 };

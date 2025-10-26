@@ -32,18 +32,13 @@ export default function MainPage() {
     try {
       let response;
 
-      // 🔹 Якщо вказано категорію — беремо пости цієї категорії
       if (categoryId) {
         const categoryData = await getPostsForCategory(categoryId);
         // categoryData shape: { page, limit, count, posts }
         response = Array.isArray(categoryData?.posts) ? categoryData.posts : [];
-      }
-      // 🔹 Якщо користувач дивиться “Відстежуються”
-      else if (source === 'Відстежуються') {
+      } else if (source === 'Відстежуються') {
         response = await getFollowingPosts();
-      }
-      // 🔹 Інакше просто всі пости
-      else {
+      } else {
         response = await getAllPosts();
       }
 
@@ -55,7 +50,6 @@ export default function MainPage() {
 
       let sortedPosts = [...postsArray];
 
-      // 🔸 Сортування
       const getDate = (p) =>
         new Date(p?.publishDate ?? p?.createdAt ?? 0).getTime();
       const getLikes = (p) => Number(p?.likes_count ?? p?.likes ?? 0);
@@ -71,7 +65,6 @@ export default function MainPage() {
 
       setPosts(sortedPosts);
 
-      // 🔸 Якщо є категорія — оновлюємо activeSource її назвою
       if (categoryId) {
         const category = categoriesList.find((c) => c.id === categoryId);
         setActiveSource(category?.title || 'Категорія');

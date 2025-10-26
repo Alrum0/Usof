@@ -48,11 +48,11 @@ CREATE TABLE IF NOT EXISTS posts
 (
     id INT PRIMARY KEY AUTO_INCREMENT,
     authorId INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(255),
     publishDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     location VARCHAR(255),
     status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
-    content TEXT NOT NULL,
+    content TEXT,
 
     CONSTRAINT fk_post_author FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE
 );

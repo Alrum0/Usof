@@ -6,6 +6,9 @@ import MessageIcon from '../assets/Icon/message-icon.svg?react';
 import RepostIcon from '../assets/Icon/repost-icon.svg?react';
 import UserTooltipWrapper from './UserTooltipWrapper';
 import AnimatedStar from '../components/AnimatedStar/AnimatedStar';
+import PostSelector from './PostSelector';
+import EditPostModal from './EditPostModal';
+import CreateComment from './CreateComment';
 
 import VerifiedIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
@@ -27,12 +30,7 @@ import { useNotification } from '../context/NotificationContext';
 
 export default function PostModel({ post }) {
   const [showTooltip, setShowTooltip] = useState(false);
-
-  const { showNotification } = useNotification();
-  const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
-  const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
-  const currentUserId = useSelector((state) => state.auth.user?.id);
-
+  const [isOpen, setIsOpen] = useState(false);
   const [likesCount, setLikesCount] = useState(post?.likes_count || 0);
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(
     !!post?.liked_by_current_user
@@ -41,6 +39,16 @@ export default function PostModel({ post }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const hoverTimer = useRef(null);
   const leaveTimer = useRef(null);
+  const selectorButtonRef = useRef(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isOpenComments, setIsOpenComments] = useState(false);
+
+  const { showNotification } = useNotification();
+
+  const currentUserId = useSelector((state) => state.auth.user?.id);
+
+  const isAdmin = post?.authorRole === 'ADMIN';
+  const isOfficial = post?.authorIsOfficial;
 
   const handleMouseEnter = () => {
     if (leaveTimer.current) {
@@ -76,7 +84,7 @@ export default function PostModel({ post }) {
     if (!post?.id) return;
 
     if (!currentUserId) {
-      showNotification('Please log in to like posts');
+      showNotification('Будь ласка, увійдіть, щоб ставити вподобання');
       return;
     }
 
@@ -124,10 +132,10 @@ export default function PostModel({ post }) {
     };
 
     fetchCommentCount();
-  }, [post?.id]);
+  }, [post?.id, showNotification]);
 
   useEffect(() => {
-    if (!post?.id) return;
+    if (!post?.id || !currentUserId) return;
 
     const fetchLikeStatus = async () => {
       try {
@@ -141,7 +149,7 @@ export default function PostModel({ post }) {
     };
 
     fetchLikeStatus();
-  }, [post?.id]);
+  }, [post?.id, currentUserId, showNotification]);
 
   return (
     <>
@@ -205,9 +213,25 @@ export default function PostModel({ post }) {
               {timeAgo(post?.publishDate)}
             </span>
           </div>
-          <button className='cursor-pointer'>
-            <MoreHorizontalIcon className='w-5 h-5' />
-          </button>
+          <div className='relative'>
+            <button
+              ref={selectorButtonRef}
+              className='cursor-pointer'
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(true);
+              }}
+            >
+              <MoreHorizontalIcon className='w-5 h-5' />
+            </button>
+            <PostSelector
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              post={post}
+              anchorRef={selectorButtonRef}
+              onOpenEdit={() => setIsEditOpen(true)}
+            />
+          </div>
         </div>
 
         <div className='ml-13'>
@@ -272,7 +296,13 @@ export default function PostModel({ post }) {
               />
               <span>{likesCount}</span>
             </button>
-            <button className='text-[var(--color-text)] items-center flex gap-1 cursor-pointer px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl active:scale-95 transition-transform duration-150'>
+            <button
+              className='text-[var(--color-text)] items-center flex gap-1 cursor-pointer px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl active:scale-95 transition-transform duration-150'
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpenComments((prev) => !prev);
+              }}
+            >
               <MessageIcon className='w-5.5 h-5.5 inline-block' />
               <span>{commentCount}</span>
             </button>
@@ -305,6 +335,18 @@ export default function PostModel({ post }) {
           </motion.div>
         )}
       </AnimatePresence>
+      {isEditOpen && (
+        <EditPostModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          postId={post?.id}
+        />
+      )}
+      <CreateComment
+        post={post}
+        onClose={() => setIsOpenComments(false)}
+        isOpen={isOpenComments}
+      />
     </>
   );
 }

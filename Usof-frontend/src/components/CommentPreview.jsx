@@ -12,9 +12,15 @@ import VerifiedIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 import LikeIcon from '../assets/Icon/like-icon.svg?react';
 
+import EditCommentModal from './EditCommentModal';
+import CommentSelector from './CommentSelector';
+
 export default function CommentPreview({ comment }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [clickedLike, setClickedLike] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const selectorButtonRef = useRef(null);
 
   const isOfficial = comment.isOfficial;
   const isAdmin = comment.role === 'ADMIN';
@@ -100,9 +106,28 @@ export default function CommentPreview({ comment }) {
             {timeAgo(comment?.publishDate)}
           </span>
         </div>
-        <button className='cursor-pointer'>
-          <MoreHorizontalIcon className='w-5 h-5' />
-        </button>
+        <div className='relative'>
+          <button
+            ref={selectorButtonRef}
+            className='cursor-pointer'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsSelectorOpen(!isSelectorOpen);
+            }}
+          >
+            <MoreHorizontalIcon className='w-5 h-5' />
+          </button>
+          <CommentSelector
+            isOpen={isSelectorOpen}
+            onClose={() => setIsSelectorOpen(false)}
+            comment={comment}
+            anchorRef={selectorButtonRef}
+            onOpenEdit={() => {
+              setIsEditOpen(true);
+              setIsSelectorOpen(false);
+            }}
+          />
+        </div>
       </div>
       <div className='ml-13'>
         <p className='text-white'>{comment.content}</p>
@@ -124,6 +149,13 @@ export default function CommentPreview({ comment }) {
       </div>
 
       <hr className='border-[var(--color-border)] -mx-8 mt-2 mb-4' />
+      {isEditOpen && (
+        <EditCommentModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          comment={comment}
+        />
+      )}
     </>
   );
 }
