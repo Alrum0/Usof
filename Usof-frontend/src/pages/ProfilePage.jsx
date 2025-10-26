@@ -4,7 +4,7 @@ import VerifyOfficialIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 
 import { useState, useEffect } from 'react';
-import { getPostsByUser } from '../http/postApi';
+import { getPostsByUser, getUserReposts } from '../http/postApi';
 import { useNotification } from '../context/NotificationContext';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const { id } = useParams();
 
   const [posts, setPosts] = useState([]);
+  const [reposts, setReposts] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -101,7 +102,25 @@ export default function ProfilePage() {
       }
     };
 
+    const fetchReposts = async () => {
+      try {
+        const response = await getUserReposts(id);
+        setReposts(
+          Array.isArray(response.data?.data)
+            ? response.data.data
+            : Array.isArray(response.data)
+            ? response.data
+            : []
+        );
+      } catch (err) {
+        showNotification(
+          err?.response?.data?.message || 'Error fetching reposts'
+        );
+      }
+    };
+
     fetchPosts();
+    fetchReposts();
   }, [userId, id]);
 
   useEffect(() => {
@@ -255,9 +274,10 @@ export default function ProfilePage() {
             </div>
           )}
           <div>
-            {posts.map((post) => (
-              <PostModel key={post.id} post={post} />
-            ))}
+            {activeTab === 'chains' &&
+              posts.map((post) => <PostModel key={post.id} post={post} />)}
+            {activeTab === 'reposts' &&
+              reposts.map((post) => <PostModel key={post.id} post={post} />)}
           </div>
         </div>
       </section>

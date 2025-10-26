@@ -25,6 +25,16 @@ router.get(
 router.delete('/:post_id/like', authMiddleware, PostController.deleteLike); // OK
 router.get('/user/:user_id', PostController.getAllPostsByUser); // OK
 
+// Repost routes
+router.post('/:post_id/repost', authMiddleware, PostController.createRepost); // Create repost
+router.delete('/:post_id/repost', authMiddleware, PostController.deleteRepost); // Remove repost
+router.get(
+  '/:post_id/repost/status',
+  authMiddleware,
+  PostController.getRepostStatus
+); // Check repost status
+router.get('/user/:user_id/reposts', PostController.getUserReposts); // Get user's reposts
+
 router.get('/:post_id', PostController.getPost); // OK
 router.patch('/:post_id', authMiddleware, PostController.updatePost); // OK
 router.delete('/:post_id', authMiddleware, PostController.deletePost); // OK

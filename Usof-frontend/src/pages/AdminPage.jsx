@@ -576,7 +576,6 @@ function EditUserModal({ user, onClose, onUpdate }) {
 
   useEffect(() => {
     if (user) {
-      console.log('EditUserModal - user data:', user); // DEBUG
       setFullName(user.fullName || '');
       setEmail(user.email || '');
       setBiography(user.biography || '');

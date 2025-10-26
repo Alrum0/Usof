@@ -26,6 +26,9 @@ import {
   deleteLike,
   getAllCommentsForPost,
   getLikeStatus,
+  createRepost,
+  deleteRepost,
+  getRepostStatus,
 } from '../http/postApi';
 import { useNotification } from '../context/NotificationContext';
 
@@ -44,6 +47,8 @@ export default function PostModel({ post }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isOpenComments, setIsOpenComments] = useState(false);
   const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
+  const [repostedByCurrentUser, setRepostedByCurrentUser] = useState(false);
+  const [repostsCount, setRepostsCount] = useState(post?.repostsCount || 0);
 
   const { showNotification } = useNotification();
 
@@ -153,6 +158,52 @@ export default function PostModel({ post }) {
 
     fetchLikeStatus();
   }, [post?.id, currentUserId, showNotification]);
+
+  useEffect(() => {
+    if (!post?.id || !currentUserId) return;
+
+    const fetchRepostStatus = async () => {
+      try {
+        const response = await getRepostStatus(post.id);
+        setRepostedByCurrentUser(!!response?.data?.reposted);
+      } catch (error) {
+        showNotification(
+          error?.response?.data?.message || 'Error fetching repost status'
+        );
+      }
+    };
+
+    fetchRepostStatus();
+  }, [post?.id, currentUserId, showNotification]);
+
+  const handleRepostClick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!post?.id) return;
+
+    if (!currentUserId) {
+      showNotification('Будь ласка, увійдіть, щоб зробити репост');
+      return;
+    }
+
+    try {
+      if (!repostedByCurrentUser) {
+        await createRepost(post.id);
+        setRepostedByCurrentUser(true);
+        setRepostsCount((prev) => prev + 1);
+        showNotification('Репост створено');
+      } else {
+        await deleteRepost(post.id);
+        setRepostedByCurrentUser(false);
+        setRepostsCount((prev) => Math.max(0, prev - 1));
+        showNotification('Репост видалено');
+      }
+    } catch (err) {
+      console.error('Error toggling repost:', err);
+      showNotification(err?.response?.data?.message || 'Error toggling repost');
+    }
+  };
 
   return (
     <>
@@ -317,8 +368,18 @@ export default function PostModel({ post }) {
               <MessageIcon className='w-5.5 h-5.5 inline-block' />
               <span>{commentCount}</span>
             </button>
-            <button className='px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer active:scale-95 transition-transform duration-150'>
-              <RepostIcon className='w-5.5 h-5.5 inline-block rotate-90' />
+            <button
+              className={`text-[var(--color-text)] items-center flex gap-1 cursor-pointer px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl active:scale-95 transition-transform duration-150 ${
+                repostedByCurrentUser ? 'text-[var(--color-text)]' : ''
+              }`}
+              onClick={handleRepostClick}
+            >
+              <RepostIcon
+                className={`w-5.5 h-5.5 inline-block rotate-90 ${
+                  repostedByCurrentUser ? 'fill-green-600' : ''
+                }`}
+              />
+              <span>{repostsCount}</span>
             </button>
           </div>
         </div>

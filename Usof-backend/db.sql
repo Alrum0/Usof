@@ -148,4 +148,16 @@ CREATE TABLE IF NOT EXISTS post_image
     fileName VARCHAR(512),
 
     CONSTRAINT fk_post_img FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE
-)
+);
+
+CREATE TABLE IF NOT EXISTS reposts
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    userId INT NOT NULL,
+    postId INT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_repost_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_repost_post FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
+    CONSTRAINT unique_repost UNIQUE (userId, postId)
+);

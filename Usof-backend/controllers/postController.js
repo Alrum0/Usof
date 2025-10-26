@@ -6,6 +6,7 @@ const PostCategories = require('../models/postCategoriesModel');
 const PostImage = require('../models/postImageModel');
 const Comment = require('../models/commentModel');
 const Like = require('../models/likeModel');
+const Repost = require('../models/repostModel');
 
 const uuid = require('uuid');
 const path = require('path');
@@ -503,6 +504,79 @@ class PostControllers {
     } catch (err) {
       console.error(err);
       return next(ApiError.internal('Failed to fetch like status'));
+    }
+  }
+
+  async createRepost(req, res, next) {
+    try {
+      const { post_id } = req.params;
+      const userId = req.user.id;
+
+      const post = await Post.findById(post_id);
+      if (!post) {
+        return next(ApiError.badRequest('Post not found'));
+      }
+
+      const existingRepost = await Repost.checkRepost(userId, post_id);
+      if (existingRepost) {
+        return next(ApiError.badRequest('You already reposted this post'));
+      }
+
+      await Repost.create({ userId, postId: post_id });
+      return res.json({ message: 'Repost created successfully' });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to create repost'));
+    }
+  }
+
+  async deleteRepost(req, res, next) {
+    try {
+      const { post_id } = req.params;
+      const userId = req.user.id;
+
+      const repost = await Repost.checkRepost(userId, post_id);
+      if (!repost) {
+        return next(ApiError.badRequest('Repost not found'));
+      }
+
+      await Repost.deleteRepost(userId, post_id);
+      return res.json({ message: 'Repost removed successfully' });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to remove repost'));
+    }
+  }
+
+  async getRepostStatus(req, res, next) {
+    try {
+      const { post_id } = req.params;
+      const userId = req.user.id;
+
+      const repost = await Repost.checkRepost(userId, post_id);
+      return res.json({ reposted: !!repost });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch repost status'));
+    }
+  }
+
+  async getUserReposts(req, res, next) {
+    try {
+      const { user_id } = req.params;
+
+      const reposts = await Repost.findByUserId(user_id);
+
+      return res.json({
+        page: 1,
+        limit: reposts.length,
+        total: reposts.length,
+        totalPages: 1,
+        data: reposts,
+      });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch user reposts'));
     }
   }
 }

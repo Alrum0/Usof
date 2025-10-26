@@ -47,7 +47,8 @@ class Categories extends BaseModel {
              FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
             ) AS images,
             COALESCE(JSON_ARRAYAGG(c.title), JSON_ARRAY()) AS categories,
-            (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+            (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+            (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
      FROM posts p
      JOIN users u ON p.authorId = u.id
      JOIN post_categories pc ON p.id = pc.postId

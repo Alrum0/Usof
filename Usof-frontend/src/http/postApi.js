@@ -251,3 +251,43 @@ export const getAllComments = async () => {
     throw err;
   }
 };
+
+export const createRepost = async (postId) => {
+  try {
+    const response = await $authHost.post(`/api/posts/${postId}/repost`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const deleteRepost = async (postId) => {
+  try {
+    const response = await $authHost.delete(`/api/posts/${postId}/repost`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getRepostStatus = async (postId) => {
+  try {
+    const response = await $authHost.get(`/api/posts/${postId}/repost/status`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getUserReposts = async (userId) => {
+  try {
+    const response = await $authHost.get(`/api/posts/user/${userId}/reposts`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

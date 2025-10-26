@@ -44,7 +44,8 @@ class Posts extends BaseModel {
   ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars,
-        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+        (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
       FROM posts p
       JOIN users u ON p.authorId = u.id
       LEFT JOIN post_image pi ON pi.postId = p.id
@@ -100,7 +101,8 @@ class Posts extends BaseModel {
   ) AS images,
       COUNT(DISTINCT l.id) AS likes_count,
       COALESCE(SUM(ps.stars), 0) AS stars,
-      (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+      (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+      (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
     FROM posts p
     JOIN users u ON p.authorId = u.id
     LEFT JOIN post_image pi ON pi.postId = p.id
@@ -152,7 +154,8 @@ class Posts extends BaseModel {
   ) AS images,
       COUNT(DISTINCT l.id) AS likes_count,
       COALESCE(SUM(ps.stars), 0) AS stars,
-      (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+      (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+      (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
     FROM posts p
     JOIN users u ON p.authorId = u.id
     INNER JOIN subscriptions s ON s.followingId = p.authorId
@@ -217,7 +220,8 @@ class Posts extends BaseModel {
    ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars,
-        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+        (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
        FROM posts p
        JOIN users u ON p.authorId = u.id
        LEFT JOIN post_image pi ON pi.postId = p.id
@@ -266,7 +270,8 @@ class Posts extends BaseModel {
   ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
         COALESCE(SUM(ps.stars), 0) AS stars,
-        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount,
+        (SELECT COUNT(*) FROM reposts WHERE postId = p.id) AS repostsCount
       FROM posts p
       JOIN users u ON p.authorId = u.id
       LEFT JOIN post_image pi ON pi.postId = p.id

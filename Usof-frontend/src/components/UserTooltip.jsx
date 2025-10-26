@@ -23,11 +23,9 @@ export default function UserTooltip({
   const [followers, setFollowers] = useState([]);
 
   const targetId = userData?.authorId || userData?.id;
-  // const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
-  // const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
 
-  const isAdmin = userData?.role === 'ADMIN';
-  const isOfficial = userData?.isOfficial;
+  const isAdmin = (userData?.authorRole || userData?.role) === 'ADMIN';
+  const isOfficial = userData?.authorIsOfficial || userData?.isOfficial;
   const isSelf = useSelector(
     (state) => state.auth.user?.id === Number(targetId)
   );
