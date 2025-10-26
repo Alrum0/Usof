@@ -50,6 +50,7 @@ class UserControllers {
           const { password, ...rest } = u;
           return rest;
         });
+        console.log('getAllUsers - admin data sample:', adminData[0]); // DEBUG
         return res.json(adminData);
       }
 
@@ -196,11 +197,7 @@ class UserControllers {
           updateData.fullName = fullName;
         }
 
-        if (email !== undefined) {
-          if (email.trim() === '') {
-            return next(ApiError.badRequest('Field "email" cannot be empty'));
-          }
-
+        if (email !== undefined && email.trim() !== '') {
           if (email !== user.email) {
             const candidateEmail = await User.findOne({ email });
             if (candidateEmail) {

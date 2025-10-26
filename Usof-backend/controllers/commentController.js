@@ -3,6 +3,16 @@ const Comment = require('../models/commentModel');
 const CommentLike = require('../models/commentLikeModel');
 
 class CommentController {
+  async getAllComments(req, res, next) {
+    try {
+      const comments = await Comment.findAll();
+      return res.json(comments);
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch all comments'));
+    }
+  }
+
   async getComment(req, res, next) {
     try {
       const { comment_id } = req.params;

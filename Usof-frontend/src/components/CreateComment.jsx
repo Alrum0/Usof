@@ -25,6 +25,8 @@ export default function CreateComment({ isOpen, onClose, post }) {
 
   const id = useSelector((state) => state.auth.user?.id);
 
+  const getName = post?.authorLogin || post?.authorName;
+
   useEffect(() => {
     const fetchUser = async () => {
       if (!id) return;
@@ -69,21 +71,17 @@ export default function CreateComment({ isOpen, onClose, post }) {
           className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-6 pt-6 pb-6 rounded-lg flex flex-col items-start shadow-lg w-1/2'
           onClick={(e) => e.stopPropagation()}
         >
-          <div className='flex w-full gap-6'>
-            {/* Left column: author avatar and connecting line to comment form */}
+          <div className='flex w-full gap-4'>
             <div className='flex flex-col items-center'>
-              {/* Author avatar */}
               <img
                 src={`${BASE_URL}/${post?.authorAvatar}`}
                 alt='author'
                 className='w-12 h-12 rounded-full flex-shrink-0 mb-1'
               />
 
-              {/* Vertical connecting line - flexible */}
               <div className='w-0.5 flex-1 bg-[var(--color-border)]' />
             </div>
 
-            {/* Right column: post and comment form */}
             <div className='flex-1'>
               <div className='flex items-start gap-2 mb-4'>
                 <div className='flex-1'>
@@ -93,7 +91,8 @@ export default function CreateComment({ isOpen, onClose, post }) {
                       className='text-white font-medium hover:underline'
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {post?.authorName}
+                      {/* {post?.authorName} */}
+                      {getName}
                     </NavLink>
 
                     {isAdmin ? (

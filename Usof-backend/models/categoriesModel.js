@@ -11,8 +11,12 @@ class Categories extends BaseModel {
     if (!row) return null;
     return {
       ...row,
-      images: typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
-      categories: typeof row.categories === 'string' ? JSON.parse(row.categories) : row.categories
+      images:
+        typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
+      categories:
+        typeof row.categories === 'string'
+          ? JSON.parse(row.categories)
+          : row.categories,
     };
   }
 
@@ -57,7 +61,7 @@ class Categories extends BaseModel {
      LIMIT ? OFFSET ?`,
       [categoryId, limit, offset]
     );
-    return rows.map(row => this.parseJsonFields(row));
+    return rows.map((row) => this.parseJsonFields(row));
   }
 }
 
