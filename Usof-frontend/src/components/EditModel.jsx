@@ -117,32 +117,36 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
     <div className='fixed inset-0 z-50'>
       <div className='absolute inset-0 bg-black opacity-50' onClick={onClose} />
 
-      <div className='absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/3 bg-[var(--color-notification)] px-8 pt-5 pb-6 rounded-lg z-50 w-2/5 border border-[var(--color-border)] ml-10'>
-        <div className='flex gap-28 items-center'>
+      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-4 md:px-8 pt-4 md:pt-5 pb-4 md:pb-6 rounded-lg z-50 w-[95%] max-w-[500px] md:w-2/5 border border-[var(--color-border)] md:ml-10 max-h-[90vh] overflow-y-auto'>
+        <div className='flex gap-10 md:gap-28 items-center justify-between md:justify-start'>
           <button
             onClick={onClose}
-            className='text-white text-base cursor-pointer'
+            className='text-white text-sm md:text-base cursor-pointer'
           >
             Скасувати
           </button>
-          <h2 className='text-white text-base font-bold'>Редагувати профіль</h2>
+          <h2 className='text-white text-sm md:text-base font-bold'>
+            Редагувати профіль
+          </h2>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className='mt-8'>
+          <div className='mt-6 md:mt-8'>
             <div className='-mt-2 flex items-center justify-between gap-4'>
-              <div className='flex flex-col flex-1'>
-                <span className='text-white ml-2'>Ім'я</span>
+              <div className='flex flex-col flex-1 min-w-0'>
+                <span className='text-white ml-2 text-sm md:text-base'>
+                  Ім'я
+                </span>
                 <input
                   name='fullName'
                   type='text'
-                  className='p-2 text-white outline-none'
+                  className='p-2 text-white outline-none bg-transparent text-sm md:text-base'
                   placeholder={userData?.fullName || 'Full Name'}
                   value={userData?.fullName || ''}
                   onChange={handleChange}
                 />
               </div>
-              <div className='h-18 w-18'>
+              <div className='h-16 w-16 md:h-18 md:w-18 flex-shrink-0'>
                 <input
                   id='fileUpload'
                   type='file'
@@ -152,7 +156,7 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
                 />
                 <label
                   htmlFor='fileUpload'
-                  className='cursor-pointer h-18 w-18'
+                  className='cursor-pointer block h-16 w-16 md:h-18 md:w-18'
                 >
                   <img
                     src={
@@ -161,7 +165,7 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
                         : `${BASE_URL}/${userData?.avatar}`
                     }
                     alt='logo profile'
-                    className='w-18 h-18 rounded-full object-cover'
+                    className='w-full h-full rounded-full object-cover'
                   />
                 </label>
               </div>
@@ -170,10 +174,12 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
             <hr className='mt-2 text-[var(--color-border)] -mx-2' />
 
             <div className='mt-4 flex flex-col'>
-              <span className='text-white ml-2'>Біографія</span>
+              <span className='text-white ml-2 text-sm md:text-base'>
+                Біографія
+              </span>
               <textarea
                 name='biography'
-                className='p-3 text-white outline-none resize-y min-h-[60px] bg-transparent  rounded-md focus:border-white transition-colors'
+                className='p-2 md:p-3 text-white outline-none resize-y min-h-[60px] bg-transparent rounded-md focus:border-white transition-colors text-sm md:text-base'
                 value={userData?.biography || ''}
                 onChange={handleChange}
                 placeholder={userData?.biography || '+ Написати біографію'}
@@ -185,11 +191,13 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
             <hr className='mt-2 text-[var(--color-border)] -mx-2' />
 
             <div className='mt-4 flex flex-col'>
-              <span className='text-white ml-2'>Пошта</span>
+              <span className='text-white ml-2 text-sm md:text-base'>
+                Пошта
+              </span>
               <input
                 name='email'
                 type='text'
-                className='p-2 text-white outline-none'
+                className='p-2 text-white outline-none bg-transparent text-sm md:text-base'
                 placeholder={userData?.email || '+ Написати пошту'}
                 value={userData?.email || ''}
                 onChange={handleChange}
@@ -197,7 +205,7 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
             </div>
 
             <button
-              className='mt-4 bg-white text-black py-3 px-4 rounded-lg font-semibold w-full'
+              className='mt-4 bg-white text-black py-2.5 md:py-3 px-4 rounded-lg font-semibold w-full text-sm md:text-base'
               disabled={loading}
             >
               {loading ? 'Збереження...' : 'Готово'}

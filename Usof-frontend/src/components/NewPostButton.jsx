@@ -12,12 +12,12 @@ export default function NewPostButton() {
     <>
       {isAuth && (
         <>
-          <div className='fixed right-0 bottom-0'>
+          <div className='fixed right-0 bottom-0 md:bottom-auto md:right-0 z-40'>
             <button
               onClick={() => setIsOpen(true)}
-              className='absolute right-8 bottom-8 px-7 py-4 rounded-xl bg-[var(--color-background-secondary)] font-semibold border border-[var(--color-border)] hover:scale-110 transition-all duration-300 cursor-pointer'
+              className='absolute right-4 md:right-8 bottom-24 md:bottom-8 px-4 md:px-7 py-3 md:py-4 rounded-xl bg-[var(--color-background-secondary)] font-semibold border border-[var(--color-border)] hover:scale-110 transition-all duration-300 cursor-pointer'
             >
-              <PlusIcon className='w-7 h-7 text-white transition-all duration-200 ' />
+              <PlusIcon className='w-6 h-6 md:w-7 md:h-7 text-white transition-all duration-200' />
             </button>
           </div>
           <CreatePostModel isOpen={isOpen} onClose={() => setIsOpen(false)} />

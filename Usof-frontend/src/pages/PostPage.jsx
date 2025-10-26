@@ -58,11 +58,11 @@ export default function PostPage() {
     fetchComments();
   }, [id, sortOrder]);
   return (
-    <section className='flex justify-center items-center flex-col'>
-      <div className='mt-10'>
+    <section className='flex justify-center items-center flex-col px-4 md:px-0'>
+      <div className='mt-6 md:mt-10'>
         <h1 className='text-xl font-bold text-white'>Ланцюжок</h1>
       </div>
-      <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-8 w-1/2'>
+      <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full md:w-1/2'>
         {loading && (
           <div className='text-[var(--color-text)] mt-4 text-sm italic'>
             Завантаження...
@@ -71,14 +71,16 @@ export default function PostPage() {
         <PostModel post={post} />
 
         <div className='mt-4 mb-4 flex items-center justify-between'>
-          <h3 className='text-white font-semibold'>Коментарі</h3>
+          <h3 className='text-white font-semibold text-sm md:text-base'>
+            Коментарі
+          </h3>
 
           <div className='relative'>
             <button
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className='px-3 py-1.5 bg-[var(--color-input)] text-white text-sm rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent)] focus:outline-none focus:border-[var(--color-accent)] transition-colors cursor-pointer'
+              className='px-2 md:px-3 py-1.5 bg-[var(--color-input)] text-white text-xs md:text-sm rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent)] focus:outline-none focus:border-[var(--color-accent)] transition-colors cursor-pointer'
             >
-              {sortOrder === 'asc' ? 'Найстарші першими' : 'Найновіші першими'}
+              {sortOrder === 'asc' ? 'Найстарші' : 'Найновіші'}
             </button>
             <AnimatePresence>
               {isSortOpen && (
@@ -87,14 +89,14 @@ export default function PostPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.12 }}
-                  className='absolute top-12 right-0 bg-[var(--color-background-secondary)] border border-[var(--color-border)] rounded-xl shadow-lg w-56 z-50 p-3'
+                  className='absolute top-12 right-0 bg-[var(--color-background-secondary)] border border-[var(--color-border)] rounded-xl shadow-lg w-48 md:w-56 z-50 p-3'
                 >
                   <div className='text-xs text-[var(--color-text)] font-medium mb-2'>
                     Сортування коментарів
                   </div>
                   <ul className='flex flex-col gap-1'>
                     <li
-                      className={`px-3 py-2 rounded-lg cursor-pointer text-white hover:bg-[#2f2f2f] transition-all ${
+                      className={`px-3 py-2 rounded-lg cursor-pointer text-white text-sm hover:bg-[#2f2f2f] transition-all ${
                         sortOrder === 'asc'
                           ? 'bg-[#2b2b2b] ring-1 ring-[var(--color-border)]'
                           : ''
@@ -107,7 +109,7 @@ export default function PostPage() {
                       Найстарші першими
                     </li>
                     <li
-                      className={`px-3 py-2 rounded-lg cursor-pointer text-white hover:bg-[#2f2f2f] transition-all ${
+                      className={`px-3 py-2 rounded-lg cursor-pointer text-white text-sm hover:bg-[#2f2f2f] transition-all ${
                         sortOrder === 'desc'
                           ? 'bg-[#2b2b2b] ring-1 ring-[var(--color-border)]'
                           : ''
@@ -126,7 +128,7 @@ export default function PostPage() {
           </div>
         </div>
 
-        <hr className='border-[var(--color-border)] -mx-8 mt-2 mb-4' />
+        <hr className='border-[var(--color-border)] -mx-4 md:-mx-8 mt-2 mb-4' />
         <div className='flex flex-col'>
           {loadingComments && (
             <div className='text-[var(--color-text)] mt-4 text-sm italic'>
@@ -134,7 +136,7 @@ export default function PostPage() {
             </div>
           )}
           {comments.length === 0 && (
-            <div className='text-[var(--color-text)] mt-2  text-center'>
+            <div className='text-[var(--color-text)] mt-2 text-center text-sm md:text-base'>
               <span className='italic'>Немає коментарів</span> 😔
             </div>
           )}

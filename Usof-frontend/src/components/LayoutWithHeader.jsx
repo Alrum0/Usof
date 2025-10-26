@@ -5,9 +5,9 @@ import NewPostButton from './NewPostButton';
 
 export default function LayoutWithHeader() {
   return (
-    <div className='flex'>
+    <div className='flex flex-col md:flex-row'>
       <Header />
-      <main className='flex-1 ml-20'>
+      <main className='flex-1 md:ml-20 mb-20 md:mb-0'>
         <LoginButton />
         <NewPostButton />
         <AppRouter />

@@ -95,8 +95,6 @@ export default function EditPostModal({ isOpen, onClose, postId }) {
     if (postId && isOpen) fetchPost();
   }, [postId, isOpen]);
 
-  if (!isOpen) return null;
-
   const isFormValid =
     categories.length > 0 && title.trim() !== '' && text.trim() !== '';
 
@@ -182,66 +180,77 @@ export default function EditPostModal({ isOpen, onClose, postId }) {
     setText((prev) => prev + emojiData.emoji);
   };
 
+  if (!isOpen) return null;
+
+  if (loading || !userData) {
+    return (
+      <section className='ml-0 md:ml-20 fixed inset-0 z-50'>
+        <div
+          className='absolute inset-0 bg-black opacity-50'
+          onClick={onClose}
+        />
+        <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-background-profile)] rounded-lg border border-[var(--color-border)] w-[95%] md:w-[48%] px-4 md:px-8 py-4 flex items-center justify-center'>
+          <span className='text-white text-sm md:text-base'>
+            Завантаження...
+          </span>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className='ml-20 fixed inset-0 z-50'>
+    <section className='ml-0 md:ml-20 fixed inset-0 z-50'>
       <div className='absolute inset-0 bg-black opacity-50' onClick={onClose} />
 
-      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-background-profile)] rounded-lg border border-[var(--color-border)] w-[48%] px-8 py-4 flex flex-col'>
-        <div className='flex justify-between items-center'>
+      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-background-profile)] rounded-lg border border-[var(--color-border)] w-[95%] md:w-[48%] px-4 md:px-8 py-4 flex flex-col max-h-[90vh] overflow-y-auto'>
+        <div className='flex gap-10 md:gap-44 items-center justify-between'>
           <button
             onClick={onClose}
-            className='text-white text-base cursor-pointer'
+            className='text-white text-sm md:text-base cursor-pointer'
           >
             Скасувати
           </button>
-          <h2 className='text-white text-base font-bold'>Редагувати пост</h2>
-          <button
-            onClick={handleDeletePost}
-            className='text-red-500 text-sm hover:underline'
-          >
-            Видалити
-          </button>
+          <h2 className='text-white text-sm md:text-base font-bold'>
+            Редагувати ланцюжок
+          </h2>
         </div>
 
-        <hr className='border-[var(--color-border)] my-4 -mx-8' />
+        <hr className='border-[var(--color-border)] my-4 -mx-4 md:-mx-8' />
 
         <div className='flex items-center gap-3'>
-          {userData?.avatar && (
-            <img
-              src={`${BASE_URL}/${userData.avatar}`}
-              alt='avatar'
-              className='w-10 h-10 rounded-full flex-shrink-0 mt-1'
-            />
-          )}
+          <img
+            src={`${BASE_URL}/${userData.avatar}`}
+            alt='logo профілю'
+            className='w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0 mt-1'
+          />
 
           <div className='flex-1'>
             <div className='flex items-center gap-2'>
-              <span className='text-white text-base font-medium'>
-                {userData?.login}
+              <span className='text-white text-sm md:text-base font-medium'>
+                {userData.login}
               </span>
-              <ChevronRight className='w-4 h-4 text-white flex-shrink-0' />
+              <ChevronRight className='w-3 h-3 md:w-4 md:h-4 text-white flex-shrink-0' />
               <CustomSelect
                 onSelect={handleCategorySelect}
                 defaultValue={categories}
-                minSelected={1}
               />
             </div>
 
             <input
               type='text'
-              className='outline-none placeholder:text-[var(--color-text)] text-white w-full bg-transparent'
-              placeholder='Заголовок'
+              className='outline-none placeholder:text-[var(--color-text)] text-white w-full bg-transparent text-sm md:text-base'
+              placeholder='Що у вас на думці?'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
         </div>
 
-        <hr className='border-[var(--color-border)] mt-3 -mx-9' />
+        <hr className='border-[var(--color-border)] mt-3 -mx-4 md:-mx-9' />
 
-        <div className='ml-10 mt-6'>
+        <div className='ml-8 md:ml-10 mt-6'>
           <CustomInput
-            placeholder='Оновіть текст поста'
+            placeholder='Що нового?'
             value={text}
             onChange={setText}
           />
@@ -249,52 +258,80 @@ export default function EditPostModal({ isOpen, onClose, postId }) {
 
         {(originalImages.length > 0 || image.length > 0) && (
           <div
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'transparent' }}
-            className='flex gap-3 justify-start ml-12 overflow-x-auto scrollbar-thin scrollbar-gray-600'
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'transparent',
+            }}
+            className='flex gap-3 justify-start ml-8 md:ml-12 overflow-x-auto scrollbar-thin scrollbar-gray-600'
           >
-            {[...originalImages, ...image].map((img, index) => (
-              <div key={index} className='relative flex-shrink-0'>
+            {originalImages.map((img, index) => (
+              <div key={`orig-${index}`} className='relative flex-shrink-0'>
                 <img
                   src={img.preview}
                   alt={`preview-${index}`}
-                  className='object-cover rounded-md border border-[var(--color-border)] h-[160px] transition-all duration-500 mb-1'
+                  className='h-[120px] md:h-[160px] object-cover rounded-md border border-[var(--color-border)] transition-all duration-500 mb-1'
                 />
+
                 <button
-                  onClick={() => handleRemoveImage(index, img.isExisting)}
+                  onClick={() => handleRemoveImage(index, true)}
                   className='absolute top-1 right-1'
                 >
-                  <PlusIcon className='w-6 h-6 text-white rotate-45' />
+                  <PlusIcon className='w-5 h-5 md:w-6 md:h-6 text-white rotate-45' />
+                </button>
+              </div>
+            ))}
+            {image.map((img, index) => (
+              <div key={`new-${index}`} className='relative flex-shrink-0'>
+                <img
+                  src={img.preview}
+                  alt={`preview-${index}`}
+                  className='h-[120px] md:h-[160px] object-cover rounded-md border border-[var(--color-border)] transition-all duration-500 mb-1'
+                />
+
+                <button
+                  onClick={() =>
+                    handleRemoveImage(originalImages.length + index, false)
+                  }
+                  className='absolute top-1 right-1'
+                >
+                  <PlusIcon className='w-5 h-5 md:w-6 md:h-6 text-white rotate-45' />
                 </button>
               </div>
             ))}
           </div>
         )}
 
-        <div className='ml-13 flex gap-1 items-center mt-2'>
-          <label htmlFor='fileUpload' className='cursor-pointer'>
-            <ImageIcon className='w-5.5 h-5.5' />
-          </label>
-          <input
-            id='fileUpload'
-            type='file'
-            multiple
-            accept='image/*'
-            onChange={handleImageChange}
-            className='hidden'
-          />
-
+        <div
+          className={`ml-9 md:ml-13 flex gap-1 items-center ${
+            originalImages.length > 0 || image.length > 0 ? 'mt-2' : 'mt-0.5'
+          }`}
+        >
+          <div>
+            <input
+              id='fileUpload'
+              type='file'
+              multiple
+              accept='image/*'
+              onChange={handleImageChange}
+              className='hidden'
+            />
+            <label htmlFor='fileUpload' className='cursor-pointer'>
+              <ImageIcon className='w-5 h-5 md:w-5.5 md:h-5.5' />
+            </label>
+          </div>
           <LocationIcon
-            className='w-5.5 h-5.5 cursor-pointer'
+            className='w-5 h-5 md:w-5.5 md:h-5.5 cursor-pointer'
             onClick={() => setOpenLocationPicker(true)}
           />
           <button onClick={() => setShowPicker((prev) => !prev)}>
-            <EmojiIcon className='w-5.5 h-5.5 cursor-pointer' />
+            <EmojiIcon className='w-5 h-5 md:w-5.5 md:h-5.5 cursor-pointer' />
           </button>
-
           {showPicker && (
             <div
               ref={pickerRef}
-              className='absolute top-10 right-30 mt-2 z-50 transition-transform duration-150'
+              className={`absolute top-10 right-4 md:right-30 mt-2 z-50 transition-transform duration-150 ${
+                showPicker ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
+              }`}
             >
               <Picker
                 onEmojiClick={onEmojiClick}
@@ -309,8 +346,8 @@ export default function EditPostModal({ isOpen, onClose, postId }) {
           {openLocationPicker && (
             <input
               type='text'
-              className='outline-none placeholder:text-[var(--color-text)] text-white w-full bg-transparent border-b border-[var(--color-border)]'
-              placeholder='Оновіть місцезнаходження'
+              className='outline-none placeholder:text-[var(--color-text)] text-white w-full bg-transparent border-b border-[var(--color-border)] text-sm md:text-base'
+              placeholder='Введіть місцезнаходження'
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               onBlur={() => setOpenLocationPicker(false)}
@@ -319,20 +356,20 @@ export default function EditPostModal({ isOpen, onClose, postId }) {
           )}
         </div>
 
-        <div className='flex justify-between mt-8 items-center'>
-          <span className='text-[var(--color-text)]'>
+        <div className='flex flex-col md:flex-row justify-between mt-8 gap-4 md:gap-0 items-center'>
+          <span className='text-[var(--color-text)] text-xs md:text-base text-center md:text-left'>
             Будь-хто може відповідати й цитувати
           </span>
           <button
             onClick={handleSubmit}
-            className={`bg-[var(--color-accent)] px-4 py-2 rounded-lg font-semibold border ${
+            className={`bg-[var(--color-accent)] px-4 py-2 rounded-lg font-semibold border text-sm md:text-base ${
               isFormValid
                 ? 'text-white border-[var(--color-border)] cursor-pointer'
                 : 'border-[var(--color-border)] text-[var(--color-text)]'
             }`}
             disabled={!isFormValid}
           >
-            Зберегти зміни
+            Зберегти
           </button>
         </div>
       </div>

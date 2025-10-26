@@ -110,9 +110,9 @@ export default function MainPage() {
 
   return (
     <>
-      <section className='flex justify-center items-center flex-col'>
-        <div className='flex justify-end gap-70 items-center w-1/2 mt-6'>
-          <div className='flex gap-2'>
+      <section className='flex justify-center items-center flex-col px-4 md:px-0'>
+        <div className='flex flex-col md:flex-row justify-between md:justify-end gap-4 md:gap-70 items-start md:items-center w-full md:w-1/2 mt-6'>
+          <div className='flex gap-2 items-center'>
             <h1 className='text-xl font-semibold text-white'>{activeSource}</h1>
 
             <div className='relative items-center'>
@@ -140,8 +140,14 @@ export default function MainPage() {
               className='bg-[var(--color-background-secondary)] border border-[var(--color-border)] py-2 px-3 rounded-full flex items-center gap-2 cursor-pointer active:scale-95 transition-transform duration-150'
               onClick={() => setSortModal((prev) => !prev)}
             >
-              <span className='text-white'>Сортування</span>
-              <img src={SortIcon} alt='sort icon' className='w-6 h-6 invert' />
+              <span className='text-white text-sm md:text-base'>
+                Сортування
+              </span>
+              <img
+                src={SortIcon}
+                alt='sort icon'
+                className='w-5 h-5 md:w-6 md:h-6 invert'
+              />
             </button>
             <SortSourceSelector
               isOpen={sortModal}
@@ -155,7 +161,7 @@ export default function MainPage() {
           </div>
         </div>
 
-        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-8 pt-4 w-1/2'>
+        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 pt-4 w-full md:w-1/2'>
           {isAuth && <NewPostInput />}
           {posts.map((post) => (
             <PostModel key={post.id} post={post} />
@@ -163,7 +169,7 @@ export default function MainPage() {
         </div>
       </section>
       <button
-        className='absolute right-6 top-6 cursor-pointer active:scale-95 transition-transform duration-150'
+        className='fixed right-4 md:right-6 top-4 md:top-6 cursor-pointer active:scale-95 transition-transform duration-150 z-30'
         onClick={() => setOpenCategoriesModal(true)}
       >
         <img src={MenuIcon} alt='Menu Icon' className='w-6 h-6 invert' />
@@ -174,7 +180,7 @@ export default function MainPage() {
         categories={categoriesList}
         onSelectCategory={(cat) => {
           setOpenCategoriesModal(false);
-          fetchPosts('Для вас', activeSort, cat.id); // 🔹 завантажуємо пости категорії
+          fetchPosts('Для вас', activeSort, cat.id);
         }}
       />
     </>

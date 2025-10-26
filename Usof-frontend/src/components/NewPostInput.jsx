@@ -42,27 +42,27 @@ export default function NewPostInput() {
     <>
       <CreatePostModel isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <button
-        className='w-full flex items-center text-left outline-none'
+        className='w-full flex items-center text-left outline-none gap-2'
         onClick={() => setIsOpen(true)}
       >
         <img
           src={userData?.avatar ? `${BASE_URL}/${userData.avatar}` : Logo}
           alt='logo profile'
-          className='w-10 h-10 rounded-full flex-shrink-0'
+          className='w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0'
         />
-        <div className='flex-1'>
+        <div className='flex-1 flex items-center gap-2'>
           <input
             type='text'
             placeholder='Що нового?'
-            className='bg-transparent w-full border-[var(--color-border)] flex-1 py-2 px-3 text-[#777777] outline-none cursor-text'
+            className='bg-transparent w-full border-[var(--color-border)] flex-1 py-2 px-3 text-[#777777] outline-none cursor-text text-sm md:text-base'
             readOnly
           />
+          <span className='text-white px-3 md:px-4 py-2 border border-[var(--color-border)] rounded-lg cursor-pointer flex-shrink-0 text-sm md:text-base'>
+            Опублікувати
+          </span>
         </div>
-        <span className='text-white px-4 py-2 border border-[var(--color-border)] rounded-lg cursor-pointer flex-shrink-0 '>
-          Опублікувати
-        </span>
       </button>
-      <hr className='border-[var(--color-border)] mt-4 -mx-8' />
+      <hr className='border-[var(--color-border)] mt-4 -mx-4 md:-mx-8' />
     </>
   );
 }

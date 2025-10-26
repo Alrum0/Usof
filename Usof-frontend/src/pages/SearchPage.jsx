@@ -38,20 +38,20 @@ export default function SearchPage() {
 
   return (
     <>
-      <section className='flex justify-center items-center flex-col'>
-        <div className='mt-10'>
+      <section className='flex justify-center items-center flex-col px-4 md:px-0'>
+        <div className='mt-6 md:mt-10'>
           <h1 className='text-xl font-bold text-white'>Пошук</h1>
         </div>
-        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-8 w-1/2'>
+        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full md:w-1/2'>
           <div className='flex justify-center items-center h-full'>
             <input
               type='text'
               placeholder='Пошук'
-              className='border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] px-2 py-3 text-white w-full outline-none placeholder:text-[var(--color-text)]'
+              className='border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] px-2 py-3 text-white w-full outline-none placeholder:text-[var(--color-text)] text-sm md:text-base'
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <div className='text-[var(--color-text)] text-base mt-4'>
+          <div className='text-[var(--color-text)] text-sm md:text-base mt-4'>
             <span className='font-medium'>
               Стежте за рекомендованими користувачами
             </span>

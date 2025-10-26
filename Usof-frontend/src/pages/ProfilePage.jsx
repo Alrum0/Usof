@@ -172,44 +172,47 @@ export default function ProfilePage() {
 
   return (
     <>
-      <section className='flex justify-center items-center flex-col'>
-        <div className='mt-10'>
+      <section className='flex justify-center items-center flex-col px-4 md:px-0'>
+        <div className='mt-6 md:mt-10'>
           <h1 className='text-xl font-bold text-white'>Профіль</h1>
         </div>
-        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-8 w-1/2'>
+        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full md:w-1/2'>
           <div className='flex justify-between items-center'>
             <div className='flex flex-col gap-0.5'>
-              <h2 className='text-white text-2xl font-medium'>
+              <h2 className='text-white text-xl md:text-2xl font-medium'>
                 {userData?.fullName}
               </h2>
               <h3 className='text-white text-[14px] font-normal'>
                 {userData?.login}
               </h3>
             </div>
-            <div className='relative w-22 h-22'>
+            <div className='relative w-16 h-16 md:w-22 md:h-22 flex-shrink-0'>
               <img
                 src={`${BASE_URL}/${userData?.avatar}`}
                 alt='logo profile'
-                className='w-22 h-22 rounded-full object-cover'
+                className='w-full h-full rounded-full object-cover'
               />
               {isAdmin ? (
                 <img
                   src={VerifyAdminIcon}
                   alt='verified'
-                  className='absolute bottom-1 -left-2 w-7 h-7'
+                  className='absolute bottom-0 md:bottom-1 -left-1 md:-left-2 w-5 h-5 md:w-7 md:h-7'
                 />
               ) : isOfficial ? (
                 <img
                   src={VerifyOfficialIcon}
                   alt='verified'
-                  className='absolute -bottom-1 -left-1 w-7 h-7'
+                  className='absolute -bottom-0.5 md:-bottom-1 -left-0.5 md:-left-1 w-5 h-5 md:w-7 md:h-7'
                 />
               ) : null}
             </div>
           </div>
 
-          <div className='-mt-1 mr-20'>
-            <span style={{ whiteSpace: 'pre-line' }} className=' text-white'>
+          <div className='mt-2 md:-mt-1 md:mr-20'>
+            <span
+              style={{ whiteSpace: 'pre-line' }}
+              className='text-white text-sm md:text-base'
+            >
               {userData?.biography}
             </span>
           </div>
@@ -243,7 +246,7 @@ export default function ProfilePage() {
                   ? () => setIsOpen(true)
                   : handleFollow
               }
-              className={`text-x py-2 border border-[var(--color-border)] rounded-lg w-full cursor-pointer 
+              className={`text-sm md:text-base py-2 border border-[var(--color-border)] rounded-lg w-full cursor-pointer 
               ${
                 isSelf
                   ? 'text-white'
@@ -259,10 +262,10 @@ export default function ProfilePage() {
                 : 'Слідкувати'}
             </button>
           </div>
-          <div className='mt-6 -mx-8 grid grid-cols-4 place-items-center text-[var(--color-text)] text-xl font-normal '>
+          <div className='mt-6 -mx-4 md:-mx-8 grid grid-cols-4 place-items-center text-[var(--color-text)] text-sm md:text-xl font-normal'>
             <button
               onClick={() => setActiveTab('chains')}
-              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer 
+              className={`border-b w-full text-center pb-3 md:pb-4 transition-colors duration-200 cursor-pointer 
       ${
         activeTab === 'chains'
           ? 'border-white text-white'
@@ -273,7 +276,7 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={() => setActiveTab('replies')}
-              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer
+              className={`border-b w-full text-center pb-3 md:pb-4 transition-colors duration-200 cursor-pointer
       ${
         activeTab === 'replies'
           ? 'border-white text-white'
@@ -284,18 +287,18 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={() => setActiveTab('media')}
-              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer
+              className={`border-b w-full text-center pb-3 md:pb-4 transition-colors duration-200 cursor-pointer
       ${
         activeTab === 'media'
           ? 'border-white text-white'
           : 'border-[var(--color-border)] text-[var(--color-text)]'
       }`}
             >
-              Медіафайли
+              Медіа
             </button>
             <button
               onClick={() => setActiveTab('reposts')}
-              className={`border-b w-full text-center pb-4 transition-colors duration-200 cursor-pointer
+              className={`border-b w-full text-center pb-3 md:pb-4 transition-colors duration-200 cursor-pointer
       ${
         activeTab === 'reposts'
           ? 'border-white text-white'

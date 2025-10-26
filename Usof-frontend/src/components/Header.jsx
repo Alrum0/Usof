@@ -55,7 +55,8 @@ export default function Header() {
   return (
     <>
       <CreatePostModel isOpen={isOpen} onClose={() => setIsOpen(false)} />
-      <header className='fixed left-0 top-0 w-20 h-screen flex flex-col justify-between items-center py-6 transition-all duration-300 z-40'>
+      {/* Desktop Header - Vertical Left */}
+      <header className='hidden md:fixed md:flex md:left-0 md:top-0 md:w-20 md:h-screen md:flex-col md:justify-between md:items-center md:py-6 transition-all duration-300 z-40'>
         <a href={MAIN_ROUTE}>
           <img
             src={Logo}
@@ -63,8 +64,8 @@ export default function Header() {
             className='w-16 h-16 hover:scale-110 transition-all duration-300'
           />
         </a>
-        <nav className='-mt-12 '>
-          <ul className='flex-col gap-4 flex '>
+        <nav className='-mt-12'>
+          <ul className='flex-col gap-4 flex'>
             <li>
               <NavLink
                 to={MAIN_ROUTE}
@@ -201,16 +202,162 @@ export default function Header() {
             </ul>
           </div>
         )}
-
-        <AuthRequiredModel
-          isOpen={isAuthModelOpen}
-          onClose={() => setIsAuthModelOpen(false)}
-        />
-        <StarsModal
-          isOpen={isStarsModelOpen}
-          onClose={() => setIsStarsModelOpen(false)}
-        />
       </header>
+
+      {/* Mobile Header - Horizontal Bottom */}
+      <header className='md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-background-secondary)] border-t border-[var(--color-border)] z-40'>
+        <nav className='px-2 py-3'>
+          <ul className='flex justify-around items-center gap-2'>
+            <li>
+              <NavLink
+                to={MAIN_ROUTE}
+                className={({ isActive }) =>
+                  `flex items-center rounded-lg px-3 py-2 transition-all duration-200 ${
+                    isActive ? 'text-white bg-[#1d1d1d]' : 'text-[#4d4d4d]'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <HomeIcon
+                    className='w-6 h-6 transition-all duration-200'
+                    fill={isActive ? 'currentColor' : 'none'}
+                  />
+                )}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={SEARCH_ROUTE}
+                className={({ isActive }) =>
+                  `flex items-center rounded-lg px-3 py-2 transition-all duration-200 ${
+                    isActive
+                      ? 'text-white bg-[var(--color-background-secondary)]'
+                      : 'text-[#4d4d4d]'
+                  }`
+                }
+              >
+                <SearchIcon className='w-6 h-6 transition-all duration-200' />
+              </NavLink>
+            </li>
+            <li>
+              <button
+                className='group rounded-lg bg-[#1d1d1d] px-3 py-2 transition-all duration-200 cursor-pointer'
+                onClick={handleProtectedAction}
+              >
+                <PlusIcon className='w-6 h-6 text-[#4d4d4d] group-hover:text-white transition-all duration-200' />
+              </button>
+            </li>
+            <li>
+              {isAuth ? (
+                <NavLink
+                  to={NOTIFICATIONS_ROUTE}
+                  className={({ isActive }) =>
+                    `flex items-center rounded-lg px-3 py-2 transition-all duration-200 ${
+                      isActive ? 'text-white' : 'text-[#4d4d4d]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <LikeIcon
+                      className='w-6 h-6 transition-all duration-200'
+                      fill={isActive ? 'currentColor' : 'none'}
+                    />
+                  )}
+                </NavLink>
+              ) : (
+                <button
+                  className='flex items-center rounded-lg px-3 py-2 transition-all duration-200 text-[#4d4d4d]'
+                  onClick={handleProtectedAction}
+                >
+                  <LikeIcon className='w-6 h-6 transition-all duration-200' />
+                </button>
+              )}
+            </li>
+            <li>
+              <NavLink
+                to={PROFILE_ROUTE + `/${userId}`}
+                onClick={(e) => {
+                  if (!isAuth) {
+                    e.preventDefault();
+                    handleProtectedAction();
+                  }
+                }}
+                className={({ isActive }) =>
+                  `flex items-center rounded-lg px-3 py-2 transition-all duration-200 ${
+                    isActive ? 'text-white' : 'text-[#4d4d4d]'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <ProfileIcon
+                    className={`w-6 h-6 transition-all duration-200 ${
+                      isActive ? 'text-white' : 'text-[#4d4d4d]'
+                    }`}
+                    fill={isActive ? 'currentColor' : 'none'}
+                  />
+                )}
+              </NavLink>
+            </li>
+            {isAdmin && (
+              <li>
+                <NavLink
+                  to={ADMIN_ROUTE}
+                  className={({ isActive }) =>
+                    `flex items-center rounded-lg px-3 py-2 transition-all duration-200 ${
+                      isActive ? 'text-white' : 'text-[#4d4d4d]'
+                    }`
+                  }
+                >
+                  <AdminIcon className='w-6 h-6 transition-all duration-200' />
+                </NavLink>
+              </li>
+            )}
+            <li>
+              <button
+                onClick={() => setIsExitModelOpen((prev) => !prev)}
+                className='group rounded-lg px-3 py-2 transition-all duration-200 cursor-pointer relative'
+              >
+                <MoreVertical className='w-6 h-6 text-[#4d4d4d] group-hover:text-white transition-all duration-200' />
+              </button>
+              {isExitModelOpen && (
+                <div className='absolute bottom-16 right-2 w-48 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-lg shadow-lg px-2'>
+                  <ul className='py-2'>
+                    <li className='hover:bg-[var(--color-background-secondary)] rounded-lg'>
+                      <button
+                        className='flex justify-center items-center w-full px-4 py-2 text-sm text-white gap-2'
+                        onClick={handleStarsAction}
+                      >
+                        <img src={Star} alt='Star' className='w-6 h-6' />
+                        <span className='ml-2'>Мої зірки</span>
+                      </button>
+                    </li>
+                    <li className='hover:bg-[var(--color-background-secondary)] rounded-lg'>
+                      <button
+                        onClick={() => {
+                          dispatch(logout());
+                          setIsExitModelOpen(false);
+                        }}
+                        className='block w-full px-4 py-2 text-sm text-red-600 text-center'
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <AuthRequiredModel
+        isOpen={isAuthModelOpen}
+        onClose={() => setIsAuthModelOpen(false)}
+      />
+      <StarsModal
+        isOpen={isStarsModelOpen}
+        onClose={() => setIsStarsModelOpen(false)}
+      />
     </>
   );
 }

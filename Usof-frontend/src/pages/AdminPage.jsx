@@ -175,16 +175,16 @@ export default function AdminPage() {
 
   return (
     <>
-      <section className='flex justify-center items-center flex-col'>
-        <div className='mt-10'>
+      <section className='flex justify-center items-center flex-col px-4 md:px-0'>
+        <div className='mt-6 md:mt-10'>
           <h1 className='text-xl font-bold text-white'>Адмін Панель</h1>
         </div>
-        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl w-4/5'>
+        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl w-full md:w-4/5'>
           {/* Табі */}
-          <div className='-mx-0 grid grid-cols-4 place-items-center text-[var(--color-text)] text-lg font-normal border-b border-[var(--color-border)]'>
+          <div className='-mx-0 grid grid-cols-4 place-items-center text-[var(--color-text)] text-sm md:text-lg font-normal border-b border-[var(--color-border)]'>
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`border-b-2 w-full text-center py-4 transition-colors duration-200 cursor-pointer ${
+              className={`border-b-2 w-full text-center py-3 md:py-4 transition-colors duration-200 cursor-pointer ${
                 activeTab === 'dashboard'
                   ? 'border-white text-white'
                   : 'border-transparent text-[var(--color-text)]'
@@ -194,7 +194,7 @@ export default function AdminPage() {
             </button>
             <button
               onClick={() => setActiveTab('users')}
-              className={`border-b-2 w-full text-center py-4 transition-colors duration-200 cursor-pointer ${
+              className={`border-b-2 w-full text-center py-3 md:py-4 transition-colors duration-200 cursor-pointer ${
                 activeTab === 'users'
                   ? 'border-white text-white'
                   : 'border-transparent text-[var(--color-text)]'
@@ -204,7 +204,7 @@ export default function AdminPage() {
             </button>
             <button
               onClick={() => setActiveTab('posts')}
-              className={`border-b-2 w-full text-center py-4 transition-colors duration-200 cursor-pointer ${
+              className={`border-b-2 w-full text-center py-3 md:py-4 transition-colors duration-200 cursor-pointer ${
                 activeTab === 'posts'
                   ? 'border-white text-white'
                   : 'border-transparent text-[var(--color-text)]'
@@ -214,7 +214,7 @@ export default function AdminPage() {
             </button>
             <button
               onClick={() => setActiveTab('categories')}
-              className={`border-b-2 w-full text-center py-4 transition-colors duration-200 cursor-pointer ${
+              className={`border-b-2 w-full text-center py-3 md:py-4 transition-colors duration-200 cursor-pointer ${
                 activeTab === 'categories'
                   ? 'border-white text-white'
                   : 'border-transparent text-[var(--color-text)]'

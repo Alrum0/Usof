@@ -76,7 +76,7 @@ export default function EditCommentModal({ isOpen, onClose, comment }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className='fixed inset-0 z-50 flex items-center justify-center'
+          className='fixed inset-0 z-50 flex items-center justify-center px-4'
         >
           <motion.div
             initial={{ opacity: 0 }}
@@ -91,10 +91,10 @@ export default function EditCommentModal({ isOpen, onClose, comment }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className='relative bg-[var(--color-background-profile)] rounded-2xl border border-[var(--color-border)] w-[90%] max-w-md px-6 py-6 flex flex-col'
+            className='relative bg-[var(--color-background-profile)] rounded-2xl border border-[var(--color-border)] w-full max-w-md px-4 md:px-6 py-4 md:py-6 flex flex-col max-h-[90vh] overflow-y-auto'
           >
             <div className='flex justify-between items-center mb-4'>
-              <h2 className='text-white text-lg font-bold'>
+              <h2 className='text-white text-base md:text-lg font-bold'>
                 Редагувати коментар
               </h2>
               <button
@@ -112,12 +112,14 @@ export default function EditCommentModal({ isOpen, onClose, comment }) {
                 <img
                   src={`${BASE_URL}/${userData.avatar}`}
                   alt='avatar'
-                  className='w-10 h-10 rounded-full flex-shrink-0'
+                  className='w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0'
                 />
               )}
-              <span className='text-white font-medium'>{userData?.login}</span>
+              <span className='text-white font-medium text-sm md:text-base truncate'>
+                {userData?.login}
+              </span>
             </div>
-            <div className='ml-9 -mt-3'>
+            <div className='ml-7 md:ml-9 -mt-3'>
               <CustomInput
                 placeholder='Оновіть текст коментаря'
                 value={content}
@@ -125,13 +127,13 @@ export default function EditCommentModal({ isOpen, onClose, comment }) {
               />
             </div>
 
-            <div className='flex items-center gap-2 mt-2 mb-4 ml-8'>
+            <div className='flex items-center gap-2 mt-2 mb-4 ml-6 md:ml-8'>
               <div className='relative'>
                 <button
                   onClick={() => setShowPicker((prev) => !prev)}
                   className='p-2 hover:bg-[#1e1e1e] rounded-lg transition-colors -mt-4 ml-2'
                 >
-                  <EmojiIcon className='w-5 h-5 cursor-pointer' />
+                  <EmojiIcon className='w-4 h-4 md:w-5 md:h-5 cursor-pointer' />
                 </button>
 
                 {showPicker && (
@@ -151,17 +153,17 @@ export default function EditCommentModal({ isOpen, onClose, comment }) {
               </div>
             </div>
 
-            <div className='flex gap-3 justify-end mt-6'>
+            <div className='flex flex-col md:flex-row gap-3 justify-end mt-6'>
               <button
                 onClick={onClose}
-                className='px-4 py-2 text-[var(--color-text)] hover:bg-[#1e1e1e] rounded-lg transition-colors'
+                className='px-4 py-2 text-[var(--color-text)] hover:bg-[#1e1e1e] rounded-lg transition-colors text-sm md:text-base'
               >
                 Скасувати
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!isFormValid || loading}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer text-sm md:text-base ${
                   isFormValid
                     ? 'bg-[var(--color-accent)] text-white hover:opacity-90'
                     : 'bg-[var(--color-border)] text-[var(--color-text)]'
