@@ -241,3 +241,13 @@ export const deleteCommentById = async (commentId) => {
     throw err;
   }
 };
+
+export const getAllComments = async () => {
+  try {
+    const response = await $authHost.get('/api/comments');
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

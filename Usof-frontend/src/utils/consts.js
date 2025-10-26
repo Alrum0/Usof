@@ -8,3 +8,4 @@ export const MAIN_ROUTE = '/';
 export const VERIFY_EMAIL_ROUTE = '/verify-email';
 export const RESET_PASSWORD_ROUTE = '/reset-password';
 export const POST_ROUTE = '/post';
+export const NOTIFICATIONS_ROUTE = '/notifications';

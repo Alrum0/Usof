@@ -22,6 +22,9 @@ export default function EditModel({ isOpen, onClose }) {
 
   useEffect(() => {
     const fetchUser = async () => {
+      // Don't fetch if user is not authenticated
+      if (!userId) return;
+
       try {
         setInitialLoading(true);
         const response = await getUser(userId);

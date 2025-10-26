@@ -9,6 +9,7 @@ import AnimatedStar from '../components/AnimatedStar/AnimatedStar';
 import PostSelector from './PostSelector';
 import EditPostModal from './EditPostModal';
 import CreateComment from './CreateComment';
+import AuthRequiredModel from './AuthRequiredModel';
 
 import VerifiedIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
@@ -42,10 +43,12 @@ export default function PostModel({ post }) {
   const selectorButtonRef = useRef(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isOpenComments, setIsOpenComments] = useState(false);
+  const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
 
   const { showNotification } = useNotification();
 
   const currentUserId = useSelector((state) => state.auth.user?.id);
+  const isAuth = useSelector((state) => state.auth.isAuth);
 
   const isAdmin = post?.authorRole === 'ADMIN';
   const isOfficial = post?.authorIsOfficial;
@@ -202,8 +205,12 @@ export default function PostModel({ post }) {
                 <img
                   src={VerifiedIcon}
                   alt='verified'
-                  className={`inline-block ml-1.5 cursor-none ${
-                    isAdmin ? 'w-4 h-4 -mt-0.5' : isOfficial ? 'w-6 h-6' : ''
+                  className={`inline-block cursor-none ${
+                    isAdmin
+                      ? 'w-4 h-4 -mt-0.5 ml-1.5'
+                      : isOfficial
+                      ? 'w-6 h-6'
+                      : ''
                   }`}
                 />
               ) : null}
@@ -300,6 +307,10 @@ export default function PostModel({ post }) {
               className='text-[var(--color-text)] items-center flex gap-1 cursor-pointer px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl active:scale-95 transition-transform duration-150'
               onClick={(e) => {
                 e.stopPropagation();
+                if (!isAuth) {
+                  setIsAuthModelOpen(true);
+                  return;
+                }
                 setIsOpenComments((prev) => !prev);
               }}
             >
@@ -346,6 +357,10 @@ export default function PostModel({ post }) {
         post={post}
         onClose={() => setIsOpenComments(false)}
         isOpen={isOpenComments}
+      />
+      <AuthRequiredModel
+        isOpen={isAuthModelOpen}
+        onClose={() => setIsAuthModelOpen(false)}
       />
     </>
   );

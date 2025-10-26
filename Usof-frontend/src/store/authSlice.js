@@ -8,7 +8,9 @@ export const login = createAsyncThunk(
     try {
       const response = await $host.post('/api/auth/login', { email, password });
       const token = response.data.accessToken;
+
       localStorage.setItem('accessToken', token);
+      // refreshToken лежить в httpOnly cookies, тому не зберігаємо його
 
       const decoded = jwtDecode(token);
 
@@ -118,6 +120,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.isAuth = false;
       localStorage.removeItem('accessToken');
+      // refreshToken видаляється на backend при запиту logout
     },
   },
   extraReducers: (builder) => {

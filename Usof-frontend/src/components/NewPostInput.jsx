@@ -15,9 +15,12 @@ export default function NewPostInput() {
   const [loading, setLoading] = useState(false);
 
   const { showNotification } = useNotification();
-  const userId = useSelector((state) => state.auth.user.id);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   useEffect(() => {
+    // Don't fetch if user is not authenticated
+    if (!userId) return;
+
     const fetchUser = async () => {
       try {
         setLoading(true);

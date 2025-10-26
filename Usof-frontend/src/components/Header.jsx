@@ -24,6 +24,7 @@ import {
   MAIN_ROUTE,
   PROFILE_ROUTE,
   SEARCH_ROUTE,
+  NOTIFICATIONS_ROUTE,
 } from '../utils/consts';
 
 export default function Header() {
@@ -102,27 +103,30 @@ export default function Header() {
               </button>
             </li>
             <li>
-              <NavLink
-                onClick={(e) => {
-                  if (!isAuth) {
-                    e.preventDefault();
-                    handleProtectedAction();
+              {isAuth ? (
+                <NavLink
+                  to={NOTIFICATIONS_ROUTE}
+                  className={({ isActive }) =>
+                    `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] ${
+                      isActive ? ' text-white' : 'text-[#4d4d4d]'
+                    }`
                   }
-                }}
-                to='/admin'
-                className={({ isActive }) =>
-                  `flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] ${
-                    isActive ? ' text-white' : 'text-[#4d4d4d]'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <LikeIcon
-                    className='w-7 h-7 transition-all duration-200'
-                    fill={isActive ? 'currentColor' : 'none'}
-                  />
-                )}
-              </NavLink>
+                >
+                  {({ isActive }) => (
+                    <LikeIcon
+                      className='w-7 h-7 transition-all duration-200'
+                      fill={isActive ? 'currentColor' : 'none'}
+                    />
+                  )}
+                </NavLink>
+              ) : (
+                <button
+                  className='flex items-center rounded-lg px-3.5 py-2 transition-all duration-200 hover:bg-[var(--color-background-secondary)] text-[#4d4d4d]'
+                  onClick={handleProtectedAction}
+                >
+                  <LikeIcon className='w-7 h-7 transition-all duration-200' />
+                </button>
+              )}
             </li>
             <li>
               <NavLink

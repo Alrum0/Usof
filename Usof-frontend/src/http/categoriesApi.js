@@ -32,3 +32,39 @@ export const getPostsForCategory = async (categoryId, page = 1, limit = 20) => {
     throw err;
   }
 };
+
+export const createCategory = async (title, description) => {
+  try {
+    const response = await $authHost.post('/api/categories', {
+      title,
+      description,
+    });
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const updateCategory = async (categoryId, title, description) => {
+  try {
+    const response = await $authHost.put(`/api/categories/${categoryId}`, {
+      title,
+      description,
+    });
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const deleteCategory = async (categoryId) => {
+  try {
+    const response = await $authHost.delete(`/api/categories/${categoryId}`);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

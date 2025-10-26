@@ -9,6 +9,7 @@ router.post('/login', loginLimiter, AuthController.login); // OK
 router.post('/refresh', AuthController.refresh); // OK
 router.post('/logout', AuthController.logout); // OK
 router.post('/password-reset', AuthController.passwordReset); // OK
+router.get('/password-reset/:confirm_token', AuthController.verifyResetToken); // OK - перенаправління на фронтенд
 router.post('/password-reset/:confirm_token', AuthController.confirmToken); // OK
 
 module.exports = router;

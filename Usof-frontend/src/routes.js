@@ -7,6 +7,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import PostPage from './pages/PostPage';
+import NotificationsPage from './pages/NotificationPage';
 
 import {
   ADMIN_ROUTE,
@@ -18,6 +19,7 @@ import {
   SEARCH_ROUTE,
   VERIFY_EMAIL_ROUTE,
   POST_ROUTE,
+  NOTIFICATIONS_ROUTE,
 } from './utils/consts';
 
 export const authRoutes = [
@@ -59,5 +61,9 @@ export const publicRoutes = [
   {
     path: POST_ROUTE + '/:id',
     Component: PostPage,
+  },
+  {
+    path: NOTIFICATIONS_ROUTE,
+    Component: NotificationsPage,
   },
 ];

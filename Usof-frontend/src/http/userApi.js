@@ -1,8 +1,9 @@
-import { $authHost } from '.';
+import { $authHost, $host } from '.';
 
 export const getUser = async (userId) => {
   try {
-    const response = await $authHost.get(`/api/users/${userId}`);
+    // public endpoint — use unauthenticated host to avoid forcing auth refresh
+    const response = await $host.get(`/api/users/${userId}`);
     return response;
   } catch (err) {
     console.error(err);
@@ -12,9 +13,9 @@ export const getUser = async (userId) => {
 
 export const getAllUsers = async (search) => {
   try {
-    const response = await $authHost.get('/api/users', {
+    // public search — don't use the auth axios instance to prevent 401-triggered redirects
+    const response = await $host.get('/api/users', {
       params: { search },
-      withCredentials: true,
     });
     return response;
   } catch (err) {

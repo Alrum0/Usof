@@ -35,9 +35,11 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('chains');
 
   const userId = useSelector((state) => state.auth.user?.id);
-  const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
-  const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
+  // const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
+  // const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
   const isSelf = userId === Number(id);
+  const isAdmin = userData?.role === 'ADMIN';
+  const isOfficial = userData?.isOfficial;
 
   const handleFollow = async () => {
     try {
@@ -71,8 +73,11 @@ export default function ProfilePage() {
         const response = await getUser(id);
         setUserData(response.data);
 
-        const followingResponse = await getFollowing(userId);
-        setFollowing(followingResponse.data.some((u) => u.id === Number(id)));
+        // Only fetch following status if user is authenticated
+        if (userId) {
+          const followingResponse = await getFollowing(userId);
+          setFollowing(followingResponse.data.some((u) => u.id === Number(id)));
+        }
       } catch (err) {
         showNotification(
           err?.response?.data?.message || 'Error fetching posts'
@@ -82,7 +87,7 @@ export default function ProfilePage() {
       }
     };
     fetchUser();
-  }, [id]);
+  }, [id, userId]);
 
   useEffect(() => {
     const fetchPosts = async () => {

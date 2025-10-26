@@ -23,8 +23,11 @@ export default function UserTooltip({
   const [followers, setFollowers] = useState([]);
 
   const targetId = userData?.authorId || userData?.id;
-  const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
-  const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
+  // const isAdmin = useSelector((state) => state.auth.user?.role === 'ADMIN');
+  // const isOfficial = useSelector((state) => state.auth.user?.isOfficial);
+
+  const isAdmin = userData?.role === 'ADMIN';
+  const isOfficial = userData?.isOfficial;
   const isSelf = useSelector(
     (state) => state.auth.user?.id === Number(targetId)
   );
@@ -88,7 +91,7 @@ export default function UserTooltip({
             <img
               src={VerifiedIcon}
               alt='verified'
-              className='absolute -bottom-1 -left-1 w-4 h-4'
+              className='absolute -bottom-1 -left-1 w-7 h-7'
             />
           ) : null}
         </div>

@@ -26,6 +26,7 @@ class UserControllers {
         rating: user.rating,
         isOfficial: user.isOfficial,
         biography: user.biography,
+        role: user.role,
       };
       return res.json(publicData);
     } catch (err) {
@@ -35,7 +36,7 @@ class UserControllers {
   async getAllUsers(req, res, next) {
     try {
       const { search } = req.query;
-      const isAdmin = req.user.role === 'ADMIN';
+      const isAdmin = req.user?.role === 'ADMIN';
 
       let users;
       if (search) {
@@ -58,6 +59,8 @@ class UserControllers {
         fullName: u.fullName,
         avatar: u.avatar,
         isVeriffied: u.isVeriffied,
+        isOfficial: u.isOfficial,
+        role: u.role,
         rating: u.rating,
       }));
 
@@ -68,8 +71,15 @@ class UserControllers {
   }
   async createUser(req, res, next) {
     try {
-      const { login, fullName, email, password, confirmPassword, role } =
-        req.body;
+      const {
+        login,
+        fullName,
+        email,
+        password,
+        confirmPassword,
+        role,
+        isOfficial,
+      } = req.body;
 
       if (req.user.role !== 'ADMIN') {
         return next(
@@ -108,6 +118,7 @@ class UserControllers {
         email,
         password: hashPassword,
         role,
+        isOfficial: isOfficial || false,
       });
 
       return res.json({ message: 'User created successfully' });
@@ -154,7 +165,8 @@ class UserControllers {
   async updateUser(req, res, next) {
     try {
       const { user_id } = req.params;
-      let { fullName, email, isOfficial, stars, biography } = req.body;
+      let { fullName, email, isOfficial, stars_balance, biography, role } =
+        req.body;
 
       const user = await User.findById(user_id);
       if (!user) {
@@ -207,7 +219,15 @@ class UserControllers {
 
       if (isAdmin) {
         if (isOfficial !== undefined) updateData.isOfficial = isOfficial;
-        if (stars !== undefined) updateData.stars = stars;
+        if (role !== undefined) {
+          if (role !== 'USER' && role !== 'ADMIN') {
+            return next(ApiError.badRequest('Invalid role (USER or ADMIN)'));
+          }
+          updateData.role = role;
+        }
+
+        if (stars_balance !== undefined)
+          updateData.stars_balance = stars_balance;
       }
 
       if (Object.keys(updateData).length === 0) {

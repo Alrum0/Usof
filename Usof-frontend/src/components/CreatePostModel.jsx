@@ -44,6 +44,9 @@ export default function CreatePostModel({ isOpen, onClose }) {
 
   useEffect(() => {
     const fetchUser = async () => {
+      // Don't fetch if user is not authenticated
+      if (!userId) return;
+
       try {
         setLoading(true);
 

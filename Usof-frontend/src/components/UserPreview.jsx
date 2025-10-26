@@ -17,6 +17,7 @@ import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 
 import UserTooltipWrapper from './UserTooltipWrapper';
 import UnfollowModel from './UnfollowModel';
+import AuthRequiredModel from './AuthRequiredModel';
 
 export default function UserPreview({ user }) {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -24,6 +25,7 @@ export default function UserPreview({ user }) {
   const [isOpen, setIsOpen] = useState(false);
   const [following, setFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isAuthModelOpen, setIsAuthModelOpen] = useState(false);
 
   const { showNotification } = useNotification();
   const hoverTimer = useRef(null);
@@ -32,6 +34,7 @@ export default function UserPreview({ user }) {
   const isOfficial = user.isOfficial;
   const isAdmin = user.role === 'ADMIN';
   const userId = useSelector((state) => state.auth.user?.id);
+  const isAuth = useSelector((state) => state.auth.isAuth);
 
   const isSelf = user.id === userId;
 
@@ -69,6 +72,11 @@ export default function UserPreview({ user }) {
   }, [user?.id]);
 
   const handleFollow = async () => {
+    if (!isAuth) {
+      setIsAuthModelOpen(true);
+      return;
+    }
+
     try {
       const response = await followUser(user.id);
       showNotification(response.data.message);
@@ -224,6 +232,10 @@ export default function UserPreview({ user }) {
         onClose={() => setIsOpen(false)}
         userData={user}
         handleUnfollow={handleUnfollow}
+      />
+      <AuthRequiredModel
+        isOpen={isAuthModelOpen}
+        onClose={() => setIsAuthModelOpen(false)}
       />
     </>
   );

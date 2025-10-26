@@ -4,7 +4,7 @@ const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 router.patch('/avatar', authMiddleware, userController.uploadAvatar); // OK
-router.get('/', authMiddleware, userController.getAllUsers); // admin OK
+router.get('/', userController.getAllUsers); // Public for search
 router.get('/:user_id', userController.getUser); // OK
 router.post('/', authMiddleware, userController.createUser); // admin OK
 router.patch('/:user_id', authMiddleware, userController.updateUser); // admin OK

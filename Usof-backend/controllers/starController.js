@@ -20,6 +20,12 @@ class StarController {
         return next(ApiError.badRequest('Post not found'));
       }
 
+      if (post.authorId === userId) {
+        return next(
+          ApiError.forbidden('Ви не можете надавати зірки власним постам')
+        );
+      }
+
       await User.updateStarsBalance(userId, -stars);
       await PostStars.create({ postId: post_id, userId, stars });
       await User.updateStarsBalance(post.authorId, stars);

@@ -16,3 +16,18 @@ export const registration = async (
     // role: 'ADMIN',
   });
 };
+
+export const passwordReset = async (email) => {
+  return await $host.post('/api/auth/password-reset', { email });
+};
+
+export const confirmResetToken = async (
+  token,
+  newPassword,
+  confirmPassword
+) => {
+  return await $host.post(`/api/auth/password-reset/${token}`, {
+    newPassword,
+    confirmPassword,
+  });
+};

@@ -43,7 +43,8 @@ class Posts extends BaseModel {
    FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
   ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
-        COALESCE(SUM(ps.stars), 0) AS stars
+        COALESCE(SUM(ps.stars), 0) AS stars,
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
       FROM posts p
       JOIN users u ON p.authorId = u.id
       LEFT JOIN post_image pi ON pi.postId = p.id
@@ -98,7 +99,8 @@ class Posts extends BaseModel {
     FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
   ) AS images,
       COUNT(DISTINCT l.id) AS likes_count,
-      COALESCE(SUM(ps.stars), 0) AS stars
+      COALESCE(SUM(ps.stars), 0) AS stars,
+      (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
     FROM posts p
     JOIN users u ON p.authorId = u.id
     LEFT JOIN post_image pi ON pi.postId = p.id
@@ -149,7 +151,8 @@ class Posts extends BaseModel {
     FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
   ) AS images,
       COUNT(DISTINCT l.id) AS likes_count,
-      COALESCE(SUM(ps.stars), 0) AS stars
+      COALESCE(SUM(ps.stars), 0) AS stars,
+      (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
     FROM posts p
     JOIN users u ON p.authorId = u.id
     INNER JOIN subscriptions s ON s.followingId = p.authorId
@@ -213,7 +216,8 @@ class Posts extends BaseModel {
      FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
    ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
-        COALESCE(SUM(ps.stars), 0) AS stars
+        COALESCE(SUM(ps.stars), 0) AS stars,
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
        FROM posts p
        JOIN users u ON p.authorId = u.id
        LEFT JOIN post_image pi ON pi.postId = p.id
@@ -261,7 +265,8 @@ class Posts extends BaseModel {
     FROM (SELECT DISTINCT fileName FROM post_image WHERE postId = p.id) t
   ) AS images,
         COUNT(DISTINCT l.id) AS likes_count,
-        COALESCE(SUM(ps.stars), 0) AS stars
+        COALESCE(SUM(ps.stars), 0) AS stars,
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) AS commentsCount
       FROM posts p
       JOIN users u ON p.authorId = u.id
       LEFT JOIN post_image pi ON pi.postId = p.id

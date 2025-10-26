@@ -263,6 +263,98 @@ class AuthControllers {
     }
   }
 
+  async verifyResetToken(req, res, next) {
+    try {
+      const { confirm_token } = req.params;
+
+      // Перевіримо, чи токен валідний
+      try {
+        jwt.verify(confirm_token, process.env.SECRET_KEY);
+      } catch (err) {
+        return res.send(
+          `
+            <!DOCTYPE html>
+            <html lang="uk">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Помилка</title>
+            </head>
+            <style>
+              body {
+                background-color: #0a0a0a;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                font-family: Arial, sans-serif;
+              }
+              section {
+                background-color: #1d1d1d;
+                border-radius: 10px;
+                border: 1px solid #313131;
+                padding: 20px;
+                text-align: center;
+              }
+              .title {
+                color: #ff4444;
+                font-size: 24px;
+                margin-bottom: 10px;
+              }
+              .sub-title {
+                color: #999;
+                font-size: 16px;
+              }
+              .button-link {
+                display: inline-block;
+                background-color: #fff;
+                color: #000;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                margin-top: 20px;
+                cursor: pointer;
+              }
+            </style>
+            <body>
+              <section>
+                <h1 class="title">Помилка</h1>
+                <p class="sub-title">Посилання для скидання пароля недійсне або прострочено.</p>
+                <a href="${process.env.CLIENT_URL}/forgot-password" class="button-link">Запросити нове посилання</a>
+              </section>
+            </body>
+            </html>
+          `
+        );
+      }
+
+      // Якщо токен валідний, переправляємо на фронтенд сторінку з автоматичним редиректом
+      return res.send(
+        `
+          <!DOCTYPE html>
+          <html lang="uk">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Редирект</title>
+          </head>
+          <body>
+            <script>
+              // Перенаправляємо на сторінку з токеном в URL
+              window.location.href = "${process.env.CLIENT_URL}/forgot-password/${confirm_token}";
+            </script>
+          </body>
+          </html>
+        `
+      );
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Something went wrong'));
+    }
+  }
+
   async verifyEmail(req, res, next) {
     try {
       const { token } = req.query;
