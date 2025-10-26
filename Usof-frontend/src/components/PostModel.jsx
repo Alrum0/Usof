@@ -53,10 +53,27 @@ export default function PostModel({ post }) {
   const { showNotification } = useNotification();
 
   const currentUserId = useSelector((state) => state.auth.user?.id);
+  const currentUserRole = useSelector((state) => state.auth.user?.role);
   const isAuth = useSelector((state) => state.auth.isAuth);
 
   const isAdmin = post?.authorRole === 'ADMIN';
   const isOfficial = post?.authorIsOfficial;
+
+  // Користувач може редагувати/видаляти, якщо він власник або адмін
+  const canEdit =
+    isAuth && (currentUserId === post?.authorId || currentUserRole === 'ADMIN');
+
+  useEffect(() => {
+    if (post?.likes_count !== undefined) {
+      setLikesCount(post.likes_count);
+    }
+  }, [post?.likes_count]);
+
+  useEffect(() => {
+    if (post?.repostsCount !== undefined) {
+      setRepostsCount(post.repostsCount);
+    }
+  }, [post?.repostsCount]);
 
   const handleMouseEnter = () => {
     if (leaveTimer.current) {
@@ -271,25 +288,27 @@ export default function PostModel({ post }) {
               {timeAgo(post?.publishDate)}
             </span>
           </div>
-          <div className='relative'>
-            <button
-              ref={selectorButtonRef}
-              className='cursor-pointer'
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(true);
-              }}
-            >
-              <MoreHorizontalIcon className='w-5 h-5' />
-            </button>
-            <PostSelector
-              isOpen={isOpen}
-              onClose={() => setIsOpen(false)}
-              post={post}
-              anchorRef={selectorButtonRef}
-              onOpenEdit={() => setIsEditOpen(true)}
-            />
-          </div>
+          {canEdit && (
+            <div className='relative'>
+              <button
+                ref={selectorButtonRef}
+                className='cursor-pointer'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(true);
+                }}
+              >
+                <MoreHorizontalIcon className='w-5 h-5' />
+              </button>
+              <PostSelector
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                post={post}
+                anchorRef={selectorButtonRef}
+                onOpenEdit={() => setIsEditOpen(true)}
+              />
+            </div>
+          )}
         </div>
 
         <div className='ml-13'>
