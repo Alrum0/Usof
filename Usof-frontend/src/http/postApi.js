@@ -309,3 +309,45 @@ export const getRepliesForComment = async (commentId) => {
     throw err;
   }
 };
+
+export const createCommentLike = async (commentId) => {
+  try {
+    const response = await $authHost.post(`/api/comments/${commentId}/like`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const deleteCommentLike = async (commentId) => {
+  try {
+    const response = await $authHost.delete(`/api/comments/${commentId}/like`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getCommentLikes = async (commentId) => {
+  try {
+    const response = await $authHost.get(`/api/comments/${commentId}/like`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getCommentLikeStatus = async (commentId) => {
+  try {
+    const response = await $authHost.get(
+      `/api/comments/${commentId}/like/status`
+    );
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

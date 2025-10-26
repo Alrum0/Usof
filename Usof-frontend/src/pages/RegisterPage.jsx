@@ -40,67 +40,112 @@ export default function RegisterPage() {
   };
 
   return (
-    <section
-      className=' h-screen bg-cover'
-      // style={{ backgroundImage: `url('/bg/bg4.png')` }}
-    >
-      <div className='flex justify-center items-center h-full'>
-        <div className='flex flex-col gap-4 p-10'>
-          <h2 className='text-white text-2xl font-semibold text-center'>
+    <section className='flex justify-center items-center min-h-screen py-8'>
+      <div className='bg-[var(--color-background-secondary)] p-10 rounded-xl flex flex-col gap-4 border border-[var(--color-border)] w-full max-w-1/3 mx-4'>
+        <div className='text-center mb-2'>
+          <h2 className='text-white text-2xl font-semibold mb-2'>
             Реєстрація в Usof
           </h2>
-          <form action='post' className='flex flex-col gap-4 w-80'>
+          <p className='text-[var(--color-text)] text-sm'>
+            Створіть обліковий запис, щоб приєднатися до спільноти
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-2'>
+            <label className='text-[var(--color-text)] text-sm font-medium'>
+              Повне імʼя
+            </label>
             <input
               type='text'
-              placeholder='Full Name'
-              className='bg-[var(--color-background-secondary)] px-5 py-3 text-white focus:border focus:border-[var(--color-border)] rounded-xl outline-0'
+              placeholder='Введіть ваше повне імʼя'
+              className='px-4 py-2 rounded-lg border border-[var(--color-border)] outline-none text-white bg-transparent focus:border-[#3869d6] transition-colors'
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              required
             />
+          </div>
+
+          <div className='flex flex-col gap-2'>
+            <label className='text-[var(--color-text)] text-sm font-medium'>
+              Email
+            </label>
             <input
-              type='text'
-              placeholder='Email'
-              className='bg-[var(--color-background-secondary)] px-5 py-3 text-white focus:border focus:border-[var(--color-border)] rounded-xl outline-0'
+              type='email'
+              placeholder='Введіть ваш email'
+              className='px-4 py-2 rounded-lg border border-[var(--color-border)] outline-none text-white bg-transparent focus:border-[#3869d6] transition-colors'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
+          </div>
+
+          <div className='flex flex-col gap-2'>
+            <label className='text-[var(--color-text)] text-sm font-medium'>
+              Імʼя користувача
+            </label>
             <input
               type='text'
-              placeholder='Username'
-              className='bg-[var(--color-background-secondary)] px-5 py-3 text-white focus:border focus:border-[var(--color-border)] rounded-xl outline-0'
+              placeholder='Оберіть унікальне імʼя користувача'
+              className='px-4 py-2 rounded-lg border border-[var(--color-border)] outline-none text-white bg-transparent focus:border-[#3869d6] transition-colors'
               value={login}
               onChange={(e) => setLogin(e.target.value)}
+              required
             />
+          </div>
+
+          <div className='flex flex-col gap-2'>
+            <label className='text-[var(--color-text)] text-sm font-medium'>
+              Пароль
+            </label>
             <input
               type='password'
-              placeholder='Password'
-              className='bg-[var(--color-background-secondary)] px-5 py-3 text-white focus:border focus:border-[var(--color-border)] rounded-xl outline-0'
+              placeholder='Створіть надійний пароль'
+              className='px-4 py-2 rounded-lg border border-[var(--color-border)] outline-none text-white bg-transparent focus:border-[#3869d6] transition-colors'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
+          </div>
+
+          <div className='flex flex-col gap-2'>
+            <label className='text-[var(--color-text)] text-sm font-medium'>
+              Підтвердження паролю
+            </label>
             <input
               type='password'
-              placeholder='Confirm Password'
-              className='bg-[var(--color-background-secondary)] px-5 py-3 text-white focus:border focus:border-[var(--color-border)] rounded-xl outline-0'
+              placeholder='Повторіть пароль'
+              className='px-4 py-2 rounded-lg border border-[var(--color-border)] outline-none text-white bg-transparent focus:border-[#3869d6] transition-colors'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              required
             />
-          </form>
+          </div>
+
           <button
-            className='bg-white px-5 py-3 text-[var(--color-text)] focus:border border-[var(--color-border)] rounded-xl outline-0 cursor-pointer'
-            onClick={handleSubmit}
+            type='submit'
+            disabled={loading}
+            className='px-4 py-2 bg-white text-[var(--color-text)] rounded-lg hover:opacity-80 transition-opacity mt-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            Зареєструватись
+            {loading ? 'Реєстрація...' : 'Зареєструватись'}
           </button>
-          <div className='relative'>
-            <hr className='text-white mt-2 relative ' />
-            <span className='absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white'>
-              або
-            </span>
-          </div>
-          <div className='text-white text-center mt-2'>
-            <a href={LOGIN_ROUTE}>Увійти</a>
-          </div>
+        </form>
+
+        <div className='relative'>
+          <hr className='border-[var(--color-border)]' />
+          <span className='absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-[var(--color-background-secondary)] px-2 text-[var(--color-text)] text-sm'>
+            або
+          </span>
+        </div>
+
+        <div className='text-[var(--color-text)] text-center'>
+          <span>Вже маєте акаунт? </span>
+          <a
+            href={LOGIN_ROUTE}
+            className='hover:underline text-[#3869d6] text-sm underline'
+          >
+            Увійти
+          </a>
         </div>
       </div>
     </section>

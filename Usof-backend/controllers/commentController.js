@@ -161,6 +161,19 @@ class CommentController {
       return next(ApiError.internal('Failed to fetch replies'));
     }
   }
+
+  async getLikeStatusForComment(req, res, next) {
+    try {
+      const { comment_id } = req.params;
+      const userId = req.user.id;
+
+      const like = await CommentLike.findOne({ userId, commentId: comment_id });
+      return res.json({ liked: !!like });
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch like status'));
+    }
+  }
 }
 
 module.exports = new CommentController();

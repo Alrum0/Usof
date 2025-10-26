@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { timeAgo } from '../utils/DateTime';
 import { PROFILE_ROUTE } from '../utils/consts';
 import UserTooltipWrapper from './UserTooltipWrapper';
+import { useSelector } from 'react-redux';
 
 import MoreHorizontalIcon from '../assets/Icon/more-horizontal-icon.svg?react';
 import VerifiedIcon from '../assets/Icon/verified.png';
@@ -17,11 +18,18 @@ import EditCommentModal from './EditCommentModal';
 import CommentSelector from './CommentSelector';
 import CreateReply from './CreateReply';
 import ReplyItem from './ReplyItem';
-import { getRepliesForComment } from '../http/postApi';
+import {
+  getRepliesForComment,
+  createCommentLike,
+  deleteCommentLike,
+  getCommentLikes,
+  getCommentLikeStatus,
+} from '../http/postApi';
 
 export default function CommentPreview({ comment, postId }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [clickedLike, setClickedLike] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
   const [isReplyOpen, setIsReplyOpen] = useState(false);
@@ -34,6 +42,7 @@ export default function CommentPreview({ comment, postId }) {
   const isAdmin = comment.role === 'ADMIN';
   const hoverTimer = useRef(null);
   const leaveTimer = useRef(null);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   const handleMouseEnter = () => {
     if (leaveTimer.current) {
@@ -56,8 +65,41 @@ export default function CommentPreview({ comment, postId }) {
   };
 
   const handleLikeClick = async (e) => {
-    setClickedLike(!clickedLike);
+    try {
+      if (clickedLike) {
+        await deleteCommentLike(comment.id);
+        setClickedLike(false);
+        setLikesCount((prev) => Math.max(0, prev - 1));
+      } else {
+        await createCommentLike(comment.id);
+        setClickedLike(true);
+        setLikesCount((prev) => prev + 1);
+      }
+    } catch (err) {
+      console.error('Error toggling like:', err);
+    }
   };
+
+  const fetchLikes = async () => {
+    try {
+      // Fetch likes count
+      const likesResponse = await getCommentLikes(comment.id);
+      const likes = likesResponse.data;
+      setLikesCount(likes.count || 0);
+
+      // Fetch like status for current user
+      if (userId) {
+        const statusResponse = await getCommentLikeStatus(comment.id);
+        setClickedLike(statusResponse.data.liked || false);
+      }
+    } catch (err) {
+      console.error('Error fetching likes:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchLikes();
+  }, [comment.id]);
 
   const fetchReplies = async () => {
     try {
@@ -188,7 +230,7 @@ export default function CommentPreview({ comment, postId }) {
               clickedLike ? 'fill-red-600' : ''
             }`}
           />
-          <span>{clickedLike ? 1 : 0}</span>
+          <span>{likesCount}</span>
         </button>
 
         <button

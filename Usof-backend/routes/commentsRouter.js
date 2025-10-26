@@ -5,6 +5,11 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.get('/', authMiddleware, CommentController.getAllComments); // Get all comments (admin)
 router.get('/:comment_id/replies', CommentController.getRepliesForComment); // OK
+router.get(
+  '/:comment_id/like/status',
+  authMiddleware,
+  CommentController.getLikeStatusForComment
+); // Get like status
 router.post(
   '/:comment_id/like',
   authMiddleware,

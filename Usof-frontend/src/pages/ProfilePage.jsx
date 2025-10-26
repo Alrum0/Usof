@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState([]);
   const [reposts, setReposts] = useState([]);
   const [comments, setComments] = useState([]);
+  const [mediaPosts, setMediaPosts] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -106,7 +107,15 @@ export default function ProfilePage() {
     const fetchPosts = async () => {
       try {
         const userPosts = await getPostsByUser(id);
-        setPosts(Array.isArray(userPosts) ? userPosts : []);
+        const postsArray = Array.isArray(userPosts) ? userPosts : [];
+        setPosts(postsArray);
+
+        // Filter posts with images for media tab
+        const postsWithImages = postsArray.filter(
+          (post) =>
+            post.images && Array.isArray(post.images) && post.images.length > 0
+        );
+        setMediaPosts(postsWithImages);
       } catch (err) {
         showNotification(
           err?.response?.data?.message || 'Error fetching posts'
@@ -307,6 +316,16 @@ export default function ProfilePage() {
             {activeTab === 'replies' &&
               comments.map((comment) => (
                 <UserCommentCard key={comment.id} comment={comment} />
+              ))}
+            {activeTab === 'media' &&
+              (mediaPosts.length > 0 ? (
+                mediaPosts.map((post) => (
+                  <PostModel key={post.id} post={post} />
+                ))
+              ) : (
+                <div className='mt-8 text-center text-[var(--color-text)]'>
+                  <p>Немає постів з медіафайлами</p>
+                </div>
               ))}
             {activeTab === 'reposts' &&
               reposts.map((post) => <PostModel key={post.id} post={post} />)}

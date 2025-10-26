@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { PROFILE_ROUTE } from '../utils/consts';
 import { timeAgo } from '../utils/DateTime';
@@ -6,10 +6,22 @@ import VerifiedIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 import CreateReply from './CreateReply';
 import EditCommentModal from './EditModel';
-import { MessageCircle, MoreVertical, Pencil, Trash2 } from 'lucide-react';
-import { deleteComment } from '../http/postApi';
+import {
+  MessageCircle,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Heart,
+} from 'lucide-react';
+import {
+  deleteComment,
+  getRepliesForComment,
+  createCommentLike,
+  deleteCommentLike,
+  getCommentLikes,
+  getCommentLikeStatus,
+} from '../http/postApi';
 import { useSelector } from 'react-redux';
-import { getRepliesForComment } from '../http/postApi';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -20,6 +32,8 @@ function ReplyItem({ reply, postId, onDelete, level = 0, isLast = false }) {
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState(reply.replies || []);
   const [repliesCount, setRepliesCount] = useState(reply.repliesCount || 0);
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
 
   const { user } = useSelector((state) => state.auth);
   const isOwner = user?.id === reply.authorId;
@@ -71,6 +85,43 @@ function ReplyItem({ reply, postId, onDelete, level = 0, isLast = false }) {
     setReplies((prev) => prev.filter((r) => r.id !== deletedId));
     setRepliesCount((prev) => Math.max(0, prev - 1));
   };
+
+  const handleLikeClick = async () => {
+    try {
+      if (liked) {
+        await deleteCommentLike(reply.id);
+        setLiked(false);
+        setLikesCount((prev) => Math.max(0, prev - 1));
+      } else {
+        await createCommentLike(reply.id);
+        setLiked(true);
+        setLikesCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error('Failed to toggle like:', error);
+    }
+  };
+
+  const fetchLikes = async () => {
+    try {
+      // Fetch likes count
+      const likesResponse = await getCommentLikes(reply.id);
+      const likes = likesResponse.data;
+      setLikesCount(likes.count || 0);
+
+      // Fetch like status for current user
+      if (user?.id) {
+        const statusResponse = await getCommentLikeStatus(reply.id);
+        setLiked(statusResponse.data.liked || false);
+      }
+    } catch (error) {
+      console.error('Failed to fetch likes:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLikes();
+  }, [reply.id]);
 
   return (
     <div className='flex gap-3 '>
@@ -158,6 +209,16 @@ function ReplyItem({ reply, postId, onDelete, level = 0, isLast = false }) {
         <p className='text-white mb-2'>{reply.content}</p>
 
         <div className='flex gap-4 text-[var(--color-text)]'>
+          <button
+            onClick={handleLikeClick}
+            className={`flex items-center gap-1 transition-colors ${
+              liked ? 'text-red-500 hover:text-red-600' : 'hover:text-red-400'
+            }`}
+          >
+            <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+            <span className='text-sm'>{likesCount}</span>
+          </button>
+
           <button
             onClick={handleReplyClick}
             className='flex items-center gap-1 hover:text-blue-400 transition-colors'
