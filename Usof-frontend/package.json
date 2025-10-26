@@ -17,6 +17,7 @@
     "framer-motion": "^12.23.22",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.548.0",
     "npm": "^11.6.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

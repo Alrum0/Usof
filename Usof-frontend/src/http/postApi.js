@@ -208,10 +208,15 @@ export const getCategoriesForPost = async (postId) => {
   }
 };
 
-export const createCommentForPost = async (postId, content) => {
+export const createCommentForPost = async (
+  postId,
+  content,
+  parentId = null
+) => {
   try {
     const response = await $authHost.post(`/api/posts/${postId}/comments`, {
       content,
+      parentId,
     });
     return response;
   } catch (err) {
@@ -241,6 +246,9 @@ export const deleteCommentById = async (commentId) => {
     throw err;
   }
 };
+
+// Alias for backward compatibility
+export const deleteComment = deleteCommentById;
 
 export const getAllComments = async () => {
   try {
@@ -285,6 +293,16 @@ export const getRepostStatus = async (postId) => {
 export const getUserReposts = async (userId) => {
   try {
     const response = await $authHost.get(`/api/posts/user/${userId}/reposts`);
+    return response;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getRepliesForComment = async (commentId) => {
+  try {
+    const response = await $authHost.get(`/api/comments/${commentId}/replies`);
     return response;
   } catch (err) {
     console.error(err);

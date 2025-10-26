@@ -1,6 +1,6 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { timeAgo } from '../utils/DateTime';
@@ -11,15 +11,23 @@ import MoreHorizontalIcon from '../assets/Icon/more-horizontal-icon.svg?react';
 import VerifiedIcon from '../assets/Icon/verified.png';
 import VerifyAdminIcon from '../assets/Icon/verify-admin.png';
 import LikeIcon from '../assets/Icon/like-icon.svg?react';
+import ReplyIcon from '../assets/Icon/message-icon.svg?react';
 
 import EditCommentModal from './EditCommentModal';
 import CommentSelector from './CommentSelector';
+import CreateReply from './CreateReply';
+import ReplyItem from './ReplyItem';
+import { getRepliesForComment } from '../http/postApi';
 
-export default function CommentPreview({ comment }) {
+export default function CommentPreview({ comment, postId }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [clickedLike, setClickedLike] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
+  const [replies, setReplies] = useState([]);
+  const [repliesCount, setRepliesCount] = useState(comment.repliesCount || 0);
   const selectorButtonRef = useRef(null);
 
   const isOfficial = comment.isOfficial;
@@ -49,6 +57,42 @@ export default function CommentPreview({ comment }) {
 
   const handleLikeClick = async (e) => {
     setClickedLike(!clickedLike);
+  };
+
+  const fetchReplies = async () => {
+    try {
+      const response = await getRepliesForComment(comment.id);
+      const repliesData = response.data || response;
+      console.log('Fetched replies for comment', comment.id, ':', repliesData);
+      setReplies(Array.isArray(repliesData) ? repliesData : []);
+    } catch (err) {
+      console.error('Error fetching replies:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (showReplies && replies.length === 0) {
+      fetchReplies();
+    }
+  }, [showReplies]);
+
+  const handleReplyClick = () => {
+    setIsReplyOpen(true);
+  };
+
+  const toggleReplies = () => {
+    setShowReplies(!showReplies);
+  };
+
+  const handleReplyAdded = () => {
+    fetchReplies();
+    setShowReplies(true);
+    setRepliesCount((prev) => prev + 1);
+  };
+
+  const handleReplyDeleted = (deletedId) => {
+    setReplies((prev) => prev.filter((r) => r.id !== deletedId));
+    setRepliesCount((prev) => Math.max(0, prev - 1));
   };
 
   return (
@@ -132,7 +176,7 @@ export default function CommentPreview({ comment }) {
       <div className='ml-13'>
         <p className='text-white'>{comment.content}</p>
       </div>
-      <div className='mt-2 ml-10'>
+      <div className='mt-2 ml-10 flex gap-2'>
         <button
           className={`text-[var(--color-text)] items-center flex gap-2 px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer ${
             clickedLike ? 'text-red-600' : ''
@@ -146,7 +190,40 @@ export default function CommentPreview({ comment }) {
           />
           <span>{clickedLike ? 1 : 0}</span>
         </button>
+
+        <button
+          className='text-[var(--color-text)] items-center flex gap-2 px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer'
+          onClick={handleReplyClick}
+        >
+          <ReplyIcon className='w-5.5 h-5.5 inline-block' />
+        </button>
+
+        {repliesCount > 0 && (
+          <button
+            className='text-blue-400 items-center flex gap-2 px-3 py-2 hover:bg-[#1e1e1e] rounded-3xl cursor-pointer text-sm'
+            onClick={toggleReplies}
+          >
+            {showReplies
+              ? 'Приховати відповіді'
+              : `Показати відповіді (${repliesCount})`}
+          </button>
+        )}
       </div>
+
+      {/* Replies section */}
+      {showReplies && replies.length > 0 && (
+        <div className='ml-6 mt-4'>
+          {replies.map((reply, index) => (
+            <ReplyItem
+              key={reply.id}
+              reply={reply}
+              postId={postId}
+              onDelete={handleReplyDeleted}
+              isLast={index === replies.length - 1}
+            />
+          ))}
+        </div>
+      )}
 
       <hr className='border-[var(--color-border)] -mx-8 mt-2 mb-4' />
       {isEditOpen && (
@@ -154,6 +231,15 @@ export default function CommentPreview({ comment }) {
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
           comment={comment}
+        />
+      )}
+      {isReplyOpen && (
+        <CreateReply
+          isOpen={isReplyOpen}
+          onClose={() => setIsReplyOpen(false)}
+          comment={comment}
+          postId={postId}
+          onReplyAdded={handleReplyAdded}
         />
       )}
     </>

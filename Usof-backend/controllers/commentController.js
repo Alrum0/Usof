@@ -144,6 +144,23 @@ class CommentController {
       return next(ApiError.internal('Failed to delete like'));
     }
   }
+
+  async getRepliesForComment(req, res, next) {
+    try {
+      const { comment_id } = req.params;
+
+      const comment = await Comment.findById(comment_id);
+      if (!comment) {
+        return next(ApiError.badRequest('Comment not found'));
+      }
+
+      const replies = await Comment.findRepliesRecursive(comment_id);
+      return res.json(replies);
+    } catch (err) {
+      console.error(err);
+      return next(ApiError.internal('Failed to fetch replies'));
+    }
+  }
 }
 
 module.exports = new CommentController();

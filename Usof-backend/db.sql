@@ -62,11 +62,13 @@ CREATE TABLE IF NOT EXISTS comments
     id INT PRIMARY KEY AUTO_INCREMENT,
     authorId INT NOT NULL,
     postId INT NOT NULL,
+    parentId INT DEFAULT NULL,
     publishDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     content TEXT NOT NULL,
 
     CONSTRAINT fk_comment_post FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
-    CONSTRAINT fk_comment_author FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_comment_author FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_parent FOREIGN KEY (parentId) REFERENCES comments(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS likes

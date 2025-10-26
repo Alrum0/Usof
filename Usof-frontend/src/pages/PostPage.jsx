@@ -139,7 +139,11 @@ export default function PostPage() {
             </div>
           )}
           {comments.map((comment) => (
-            <CommentPreview key={comment.id} comment={comment} />
+            <CommentPreview
+              key={comment.id}
+              comment={comment}
+              postId={post?.id}
+            />
           ))}
         </div>
       </div>

@@ -71,7 +71,7 @@ class PostControllers {
   async createCommentForPost(req, res, next) {
     try {
       const { post_id } = req.params;
-      const { content } = req.body;
+      const { content, parentId } = req.body;
       const authorId = req.user.id;
 
       const post = await Post.findById(post_id);
@@ -84,14 +84,41 @@ class PostControllers {
       }
 
       if (!content) {
-        next(ApiError.badRequest('Content is required'));
+        return next(ApiError.badRequest('Content is required'));
       }
 
-      await Comment.create({
+      // Check if parentId column exists
+      const db = require('../db');
+      const [columns] = await db.query(
+        `SHOW COLUMNS FROM comments LIKE 'parentId'`
+      );
+      const hasParentId = columns.length > 0;
+
+      // If parentId is provided and column exists, verify the parent comment exists
+      if (parentId && hasParentId) {
+        const parentComment = await Comment.findById(parentId);
+        if (!parentComment) {
+          return next(ApiError.badRequest('Parent comment not found'));
+        }
+        if (parentComment.postId !== parseInt(post_id)) {
+          return next(
+            ApiError.badRequest('Parent comment does not belong to this post')
+          );
+        }
+      }
+
+      const commentData = {
         postId: post_id,
         authorId,
         content,
-      });
+      };
+
+      // Only add parentId if the column exists
+      if (hasParentId && parentId) {
+        commentData.parentId = parentId;
+      }
+
+      await Comment.create(commentData);
 
       res.json({ message: 'Comment created successfully' });
     } catch (err) {
