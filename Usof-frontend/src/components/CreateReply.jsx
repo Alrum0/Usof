@@ -68,7 +68,7 @@ export default function CreateReply({
         onClick={onClose}
       >
         <div
-          className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-4 md:px-6 pt-4 md:pt-6 pb-4 md:pb-6 rounded-lg flex flex-col items-start shadow-lg w-full max-w-[95%] md:max-w-[50%] max-h-[90vh] overflow-y-auto'
+          className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-4 md:px-6 pt-4 md:pt-6 pb-4 md:pb-6 rounded-lg flex flex-col items-start shadow-lg w-full max-w-[95%] md:max-w-[70%] lg:max-w-[50%] max-h-[90vh] overflow-y-auto'
           onClick={(e) => e.stopPropagation()}
         >
           <div className='flex w-full gap-3 md:gap-4'>

@@ -117,7 +117,7 @@ export default function EditModel({ isOpen, onClose, onUpdate }) {
     <div className='fixed inset-0 z-50'>
       <div className='absolute inset-0 bg-black opacity-50' onClick={onClose} />
 
-      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-4 md:px-8 pt-4 md:pt-5 pb-4 md:pb-6 rounded-lg z-50 w-[95%] max-w-[500px] md:w-2/5 border border-[var(--color-border)] md:ml-10 max-h-[90vh] overflow-y-auto'>
+      <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--color-notification)] px-4 md:px-8 pt-4 md:pt-5 pb-4 md:pb-6 rounded-lg z-50 w-[95%] max-w-[500px] md:max-w-[70%] lg:max-w-[500px] border border-[var(--color-border)] md:ml-10 max-h-[90vh] overflow-y-auto'>
         <div className='flex gap-10 md:gap-28 items-center justify-between md:justify-start'>
           <button
             onClick={onClose}

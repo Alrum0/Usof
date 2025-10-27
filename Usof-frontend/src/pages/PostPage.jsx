@@ -62,7 +62,7 @@ export default function PostPage() {
       <div className='mt-6 md:mt-10'>
         <h1 className='text-xl font-bold text-white'>Ланцюжок</h1>
       </div>
-      <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full md:w-1/2'>
+      <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full max-w-2xl'>
         {loading && (
           <div className='text-[var(--color-text)] mt-4 text-sm italic'>
             Завантаження...

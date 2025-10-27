@@ -42,7 +42,7 @@ export default function SearchPage() {
         <div className='mt-6 md:mt-10'>
           <h1 className='text-xl font-bold text-white'>Пошук</h1>
         </div>
-        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full md:w-1/2'>
+        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 w-full max-w-2xl'>
           <div className='flex justify-center items-center h-full'>
             <input
               type='text'

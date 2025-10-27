@@ -111,7 +111,7 @@ export default function MainPage() {
   return (
     <>
       <section className='flex justify-center items-center flex-col px-4 md:px-0'>
-        <div className='flex flex-col md:flex-row justify-between md:justify-end gap-4 md:gap-70 items-start md:items-center w-full md:w-1/2 mt-6'>
+        <div className='relative flex flex-col md:flex-row justify-center items-center w-full max-w-2xl mt-6 gap-4 md:gap-0'>
           <div className='flex gap-2 items-center'>
             <h1 className='text-xl font-semibold text-white'>{activeSource}</h1>
 
@@ -135,7 +135,8 @@ export default function MainPage() {
               />
             </div>
           </div>
-          <div className='relative'>
+
+          <div className='relative md:absolute md:right-0'>
             <button
               className='bg-[var(--color-background-secondary)] border border-[var(--color-border)] py-2 px-3 rounded-full flex items-center gap-2 cursor-pointer active:scale-95 transition-transform duration-150'
               onClick={() => setSortModal((prev) => !prev)}
@@ -161,7 +162,7 @@ export default function MainPage() {
           </div>
         </div>
 
-        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 pt-4 w-full md:w-1/2'>
+        <div className='mt-6 bg-[var(--color-background-profile)] border border-[var(--color-border)] rounded-2xl p-4 md:p-8 pt-4 w-full max-w-2xl'>
           {isAuth && <NewPostInput />}
           {posts.map((post) => (
             <PostModel key={post.id} post={post} />
