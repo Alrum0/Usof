@@ -1,6 +1,6 @@
 # USOF 
 
-A full-featured platform for knowledge sharing and developer communication, inspired by Stack Overflow.
+A full-featured platform for knowledge sharing and communication.
 
 ## 📋 Table of Contents
 
