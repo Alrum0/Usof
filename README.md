@@ -1,4 +1,4 @@
-# USOF - Ukrainian Stack Overflow
+# USOF 
 
 A full-featured platform for knowledge sharing and developer communication, inspired by Stack Overflow.
 
